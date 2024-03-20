@@ -9,6 +9,7 @@ void main() async {
   // Shared Preference 인스턴스 생성
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
+
   runApp(const MyApp());
 }
 
