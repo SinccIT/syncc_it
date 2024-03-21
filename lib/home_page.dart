@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:syncc_it/profile.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key});
@@ -8,7 +9,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: CupertinoColors.systemMint,
+        backgroundColor: Color(0xFF27F390),
         title: Text(
           'SynccIT',
           style: TextStyle(
@@ -29,7 +30,7 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+      body: MyProfile(),
     );
   }
 }
-
