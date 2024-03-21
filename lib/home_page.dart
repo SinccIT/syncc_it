@@ -219,6 +219,7 @@ class _HomePageState extends State<HomePage> {
 
           });
         },
+
         selectedItemColor: Color(0xFFFFFF), // 선택된 항목의 색상
         unselectedItemColor: Colors.grey,
         backgroundColor: Color(0xFF313034),
