@@ -3,13 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncc_it/home_page.dart';
 
 void main() async {
-
   // main()에서 async 사용
   WidgetsFlutterBinding.ensureInitialized();
 
   // Shared Preference 인스턴스 생성
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
 
   runApp(const MyApp());
 }
