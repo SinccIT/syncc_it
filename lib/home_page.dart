@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'contact_page.dart';
+import 'data_model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -12,24 +13,14 @@ class HomePage extends StatefulWidget {
 
 // 상태 클래스
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
 
-  // 더미데이터
-  List<Group> groupList = [
-    Group('Family', '우리 가족 연락처'),
-    Group('Office', '사무실 연락망'),
-  ];
-
-  List<Contact> contactList = [
-    Contact('John Doe', 'Friend', 'Active'),
-    Contact('Jane Smith', 'Colleague', 'Inactive'),
-    Contact('John Doe', 'Friend', 'Active'),
-    Contact('Jane Smith', 'Colleague', 'Inactive'),
-    Contact('John Doe', 'Friend', 'Active'),
-    Contact('Jane Smith', 'Colleague', 'Inactive'),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    // DataModel에 접근
+    final data = DataProvider.of(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF27F39D),
@@ -95,108 +86,127 @@ class _HomePageState extends State<HomePage> {
 
           // 그룹 및 연락처 목록
           Expanded(
-            child: ListView.builder(
-              itemCount: groupList.length + contactList.length + 4,
-              itemBuilder: (context, index) {
-                if(index == 0) {
-                  // divider
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Divider(
-                      thickness: 1,
-                      color: Color(0xFFEEEEEE),
-                    ),
-                  );
+            child: Consumer<DataModel>(
+              builder: (context, data, child) {
+                return ListView.builder(
 
-                } else if (index == 1) {
-                  // 그룹 라벨
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      '그룹',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF27F39D),
-                      ),
-                    ),
-                  );
+                  itemCount: data.groupList.length + data.contactList.length + 4,
+                  itemBuilder: (context, index) {
 
-                } else if (index < groupList.length+2) {
-                  // 그룹 목록
-                  Group group = groupList[index-2];
-                  return ListTile(
-                    title: Text(
-                      group.groupName,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                      ),
-                    ),
-                    subtitle: Text(
-                      group.desc,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFFC8C8C8),
-                      ),
-                    ),
-                    onTap: () {
-                      // 클릭 시 해당 그룹 연락처 조회 페이지로 이동
-                    },
-                  );
+                    if(index == 0) {
+                      // divider
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Divider(
+                          thickness: 1,
+                          color: Color(0xFFEEEEEE),
+                        ),
+                      );
 
-                } else if (index == groupList.length+2) {
-                  // divider
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Divider(
-                      thickness: 1,
-                      color: Color(0xFFEEEEEE),
-                    ),
-                  );
+                    } else if (index == 1) {
+                      // 그룹 라벨
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          '그룹',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF27F39D),
+                          ),
+                        ),
+                      );
 
-                } else if (index == groupList.length+3) {
-                  // 연락처 라벨
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      '연락처',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF27F39D),
-                      ),
-                    ),
-                  );
-                } else {
-                  // 연락처 목록
-                  Contact contact = contactList[index - groupList.length-4];
-                  return ListTile(
-                    title: Text(
-                      contact.name,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                      ),
-                    ),
-                    subtitle: Text(
-                      contact.desc,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFFC8C8C8),
-                      ),
-                    ),
-                    onTap: () {},
-                  );
-                }
+                    } else if (index < data.groupList.length+2) {
+                      // 그룹 목록
+                      Group group = data.groupList[index-2];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          child: Text(group.groupName[0]),
+                          backgroundColor: Color(0xFFEEEEEE),
+                        ),
+                        title: Text(
+                          group.groupName,
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
+                        subtitle: Text(
+                          group.desc,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFFC8C8C8),
+                          ),
+                        ),
+                        onTap: () {
+                          // 클릭 시 해당 그룹 연락처 조회 페이지로 이동
+                        },
+                      );
+
+                    } else if (index == data.groupList.length+2) {
+                      // divider
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Divider(
+                          thickness: 1,
+                          color: Color(0xFFEEEEEE),
+                        ),
+                      );
+
+                    } else if (index == data.groupList.length+3) {
+                      // 연락처 라벨
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          '연락처',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF27F39D),
+                          ),
+                        ),
+                      );
+                    } else {
+                      // 연락처 목록
+                      Contact contact = data.contactList[index - data.groupList.length-4];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          child: Text(contact.name[0]),
+                          backgroundColor: Color(0xFFEEEEEE),
+                        ),
+                        title: Text(
+                          contact.name,
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
+                        subtitle: Text(
+                          contact.desc,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFFC8C8C8),
+                          ),
+                        ),
+                        onTap: () {},
+                      );
+                    }
+                  },
+
+                );
               },
+
             ),
           ),
         ],
       ),
 
-      // botton navigation bar
+      // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color(0xFF313034),
+        selectedItemColor: Color(0xFF27F39D), // 선택된 항목의 색상
+        unselectedItemColor: Color(0xFFC8C8C8), // 선택되지 않은 항목의 색상
         showUnselectedLabels: true,
-        items: [
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -216,41 +226,40 @@ class _HomePageState extends State<HomePage> {
         ],
         onTap: (value) {
           setState(() {
-
+            switch(value) {
+              case 0:
+              // Home 탭
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+                break;
+              case 1:
+              // 그룹 탭
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+                break;
+              case 2:
+              // 연락처 탭
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ContactPage(data: data)),
+                );
+                break;
+              case 3:
+              // 메시지 탭
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+                break;
+            }
           });
         },
-
-        selectedItemColor: Color(0xFFFFFF), // 선택된 항목의 색상
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Color(0xFF313034),
       ),
 
     );
-  }
-}
-
-
-
-class Contact {
-  String name;
-  String desc;
-  String status;
-
-  Contact(this.name, this.desc, this.status);
-}
-
-class Group {
-  String groupName;
-  String desc;
-
-  Group(this.groupName, this.desc);
-}
-
-class BottomBar extends StatelessWidget {
-  const BottomBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
