@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class TabBarScreen extends StatefulWidget {
+class ContactsScreen extends StatefulWidget {
   @override
-  _TabBarScreenState createState() => _TabBarScreenState();
+  _ContactsScreenState createState() => _ContactsScreenState();
 }
 
-class _TabBarScreenState extends State<TabBarScreen> {
-  late SharedPreferences prefs;
-  late List<String> _sharedItems;
-  late List<String> _sharedDescriptions;
+class _ContactsScreenState extends State<ContactsScreen> {
+  late SharedPreferences _prefs;
+  late List<String> _contactItems;
+  late List<String> _contactItemDescriptions;
   late bool _initialized = false;
 
   @override
@@ -19,58 +19,60 @@ class _TabBarScreenState extends State<TabBarScreen> {
   }
 
   Future<void> _initSharedPreferences() async {
-    prefs = await SharedPreferences.getInstance();
-    _sharedItems = prefs.getStringList('contactItems') ?? [];
-    _sharedDescriptions = prefs.getStringList('contactItemDescriptions') ?? [];
+    _prefs = await SharedPreferences.getInstance();
+    _contactItems = _prefs.getStringList('contactItems') ?? [];
+    _contactItemDescriptions =
+        _prefs.getStringList('contactItemDescriptions') ?? [];
     setState(() {
       _initialized = true;
     });
   }
 
-  void _addItem(String item, String description) async {
+  void _addItemToContacts(String item, String description) async {
     setState(() {
-      _sharedItems.add(item);
-      _sharedDescriptions.add(description);
+      _contactItems.add(item);
+      _contactItemDescriptions.add(description);
     });
-    await prefs.setStringList('_sharedItems', _sharedItems);
-    await prefs.setStringList('_sharedDescriptions', _sharedDescriptions);
+    await _prefs.setStringList('contactItems', _contactItems);
+    await _prefs.setStringList(
+        'contactItemDescriptions', _contactItemDescriptions);
   }
 
   void _removeItem(int index) async {
     setState(() {
-      _sharedItems.removeAt(index);
-      _sharedDescriptions.removeAt(index);
+      _contactItems.removeAt(index);
+      _contactItemDescriptions.removeAt(index);
     });
-    await prefs.setStringList('_sharedItems', _sharedItems);
-    await prefs.setStringList('_sharedDescriptions', _sharedDescriptions);
+    await _prefs.setStringList('contactItems', _contactItems);
+    await _prefs.setStringList(
+        'contactItemDescriptions', _contactItemDescriptions);
   }
 
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      return Center(child: CircularProgressIndicator()); // 로딩 인디케이터 중앙 정렬
+      return Center(child: CircularProgressIndicator());
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('그룹 목록'),
+        title: Text('연락처 목록'),
       ),
       body: ListView.builder(
-        itemCount: _sharedItems.length,
+        itemCount: _contactItems.length,
         itemBuilder: (context, index) {
           return Card(
-            elevation: 3, // 그림자 효과
+            elevation: 3,
             margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: ListTile(
               leading: Icon(Icons.share),
               title: Text(
-                _sharedItems[index],
+                _contactItems[index],
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(_sharedDescriptions[index]),
+              subtitle: Text(_contactItemDescriptions[index]),
               trailing: IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
-                  // 삭제 모달 표시
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -80,17 +82,16 @@ class _TabBarScreenState extends State<TabBarScreen> {
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // 모달 닫기
+                              Navigator.of(context).pop();
                             },
                             child: Text("취소"),
                           ),
                           TextButton(
                             onPressed: () {
-                              // 항목 삭제
                               setState(() {
                                 _removeItem(index);
                               });
-                              Navigator.of(context).pop(); // 모달 닫기
+                              Navigator.of(context).pop();
                             },
                             child: Text("삭제"),
                           ),
@@ -109,7 +110,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddContactScreen(onAdd: _addItem),
+              builder: (context) =>
+                  AddContactScreen1(onAdd: _addItemToContacts),
             ),
           );
         },
@@ -119,30 +121,30 @@ class _TabBarScreenState extends State<TabBarScreen> {
   }
 }
 
-class AddContactScreen extends StatefulWidget {
+class AddContactScreen1 extends StatefulWidget {
   final Function(String, String) onAdd;
 
-  const AddContactScreen({Key? key, required this.onAdd}) : super(key: key);
+  const AddContactScreen1({Key? key, required this.onAdd}) : super(key: key);
 
   @override
-  _AddContactScreenState createState() => _AddContactScreenState();
+  _AddContactScreenState1 createState() => _AddContactScreenState1();
 }
 
-class _AddContactScreenState extends State<AddContactScreen> {
-  late TextEditingController _nameController1;
-  late TextEditingController _descriptionController1;
+class _AddContactScreenState1 extends State<AddContactScreen1> {
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
 
   @override
   void initState() {
     super.initState();
-    _nameController1 = TextEditingController();
-    _descriptionController1 = TextEditingController();
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _nameController1.dispose();
-    _descriptionController1.dispose();
+    _nameController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -150,7 +152,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('그룹 추가'),
+        title: Text('연락처 추가'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -158,23 +160,23 @@ class _AddContactScreenState extends State<AddContactScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              controller: _nameController1,
+              controller: _nameController,
               decoration: InputDecoration(
-                labelText: 'Group Name',
+                labelText: 'Name',
               ),
             ),
             SizedBox(height: 12.0),
             TextField(
-              controller: _descriptionController1,
+              controller: _descriptionController,
               decoration: InputDecoration(
-                labelText: 'Group Description',
+                labelText: 'Description',
               ),
             ),
             SizedBox(height: 24.0),
             ElevatedButton(
               onPressed: () {
-                final name = _nameController1.text;
-                final description = _descriptionController1.text;
+                final name = _nameController.text;
+                final description = _descriptionController.text;
                 widget.onAdd(name, description);
                 Navigator.pop(context);
               },

@@ -1,12 +1,12 @@
 // import 'package:flutter/cupertino.dart';
 // import 'package:flutter/material.dart';
 //
-// class AddItemScreen extends StatefulWidget {
+// class AddItemScreen1 extends StatefulWidget {
 //   @override
-//   _AddItemScreenState createState() => _AddItemScreenState();
+//   _AddItemScreen1State createState() => _AddItemScreen1State();
 // }
 //
-// class _AddItemScreenState extends State<AddItemScreen> {
+// class _AddItemScreen1State extends State<AddItemScreen1> {
 //   late TextEditingController _textEditingController;
 //
 //   @override
@@ -25,7 +25,7 @@
 //   Widget build(BuildContext context) {
 //     return Scaffold(
 //       appBar: AppBar(
-//         title: const Text("새로운 그룹 추가"),
+//         title: const Text("새로운 연락처 추가"),
 //       ),
 //       body: Padding(
 //         padding: const EdgeInsets.all(16.0),
@@ -34,7 +34,7 @@
 //           children: [
 //             TextField(
 //               controller: _textEditingController,
-//               decoration: InputDecoration(labelText: '항목 이름'),
+//               decoration: InputDecoration(labelText: '연락처 이름'),
 //             ),
 //             SizedBox(height: 20),
 //             ElevatedButton(
@@ -51,12 +51,13 @@
 //   }
 // }
 //
-// // 예시 데이터 배열
-// List<String> sharedItemDescriptions = [
-//   "One 아이템 설명",
-//   "LG전자 아이템 설명",
-//   "Two 아이템 설명",
-//   "Hymedia 아이템 설명",
-//   "SAMSUNG전자 아이템 설명",
+// // 각 아이템에 대한 설명 배열
+// List<String> contactItemDescriptions = [
+//   "박채연 설명",
+//   "유윤경 설명",
+//   "김성종 설명",
+//   "이한조 설명",
+//   "백승용 설명",
+//   "송가람 설명",
 //   // 추가적인 아이템들에 대한 설명을 배열에 추가하세요
 // ];
