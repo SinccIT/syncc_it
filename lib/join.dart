@@ -5,6 +5,13 @@ import 'joinup.dart'; // 위젯이 정의된 파일을 가져옴
 
 // JoinPage 위젯을 StatelessWidget으로 정의.
 class JoinPage extends StatelessWidget {
+  List<bool> isCheckedList = [
+    false,
+    false,
+    false,
+    false
+  ]; // 각 체크박스의 상태를 저장하는 리스트
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -89,10 +96,10 @@ class JoinPage extends StatelessWidget {
                                     Row(
                                       children: [
                                         CustomCheckbox(
-                                          value: isChecked,
+                                          value: isCheckedList[0],
                                           onChanged: (value) {
                                             setState(() {
-                                              isChecked = value!;
+                                              isCheckedList[0] = value!;
                                             });
                                           },
                                         ),
@@ -110,10 +117,10 @@ class JoinPage extends StatelessWidget {
                                     Row(
                                       children: [
                                         CustomCheckbox(
-                                          value: isChecked,
+                                          value: isCheckedList[1],
                                           onChanged: (value) {
                                             setState(() {
-                                              isChecked = value!;
+                                              isCheckedList[1] = value!;
                                             });
                                           },
                                         ),
@@ -131,10 +138,10 @@ class JoinPage extends StatelessWidget {
                                     Row(
                                       children: [
                                         CustomCheckbox(
-                                          value: isChecked,
+                                          value: isCheckedList[2],
                                           onChanged: (value) {
                                             setState(() {
-                                              isChecked = value!;
+                                              isCheckedList[2] = value!;
                                             });
                                           },
                                         ),
@@ -152,10 +159,10 @@ class JoinPage extends StatelessWidget {
                                     Row(
                                       children: [
                                         CustomCheckbox(
-                                          value: isChecked,
+                                          value: isCheckedList[3],
                                           onChanged: (value) {
                                             setState(() {
-                                              isChecked = value!;
+                                              isCheckedList[3] = value!;
                                             });
                                           },
                                         ),

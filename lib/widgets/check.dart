@@ -9,7 +9,7 @@ class CustomCheckbox extends StatefulWidget {
   const CustomCheckbox({
     required this.value,
     required this.onChanged,
-    this.size = 24.0,
+    this.size = 36.0,
     this.child,
     Key? key,
   }) : super(key: key);
@@ -31,9 +31,10 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
         width: widget.size,
         height: widget.size,
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(4.0), // 사각형 형태로 설정
           border: Border.all(
-            color: Colors.black,
+            color: Colors.transparent,
             width: 2.0,
           ),
         ),
