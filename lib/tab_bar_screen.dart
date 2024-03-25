@@ -8,8 +8,8 @@ class TabBarScreen extends StatefulWidget {
 
 class _TabBarScreenState extends State<TabBarScreen> {
   late SharedPreferences prefs;
-  late List<String> _sharedItems;
-  late List<String> _sharedDescriptions;
+  late List<String> _groupItems;
+  late List<String> _groupItemDescriptions;
   late bool _initialized = false;
 
   @override
@@ -20,8 +20,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
 
   Future<void> _initSharedPreferences() async {
     prefs = await SharedPreferences.getInstance();
-    _sharedItems = prefs.getStringList('contactItems') ?? [];
-    _sharedDescriptions = prefs.getStringList('contactItemDescriptions') ?? [];
+    _groupItems = prefs.getStringList('groupItems') ?? [];
+    _groupItemDescriptions = prefs.getStringList('groupItemDescriptions') ?? [];
     setState(() {
       _initialized = true;
     });
@@ -29,48 +29,47 @@ class _TabBarScreenState extends State<TabBarScreen> {
 
   void _addItem(String item, String description) async {
     setState(() {
-      _sharedItems.add(item);
-      _sharedDescriptions.add(description);
+      _groupItems.add(item);
+      _groupItemDescriptions.add(description);
     });
-    await prefs.setStringList('_sharedItems', _sharedItems);
-    await prefs.setStringList('_sharedDescriptions', _sharedDescriptions);
+    await prefs.setStringList('groupItems', _groupItems);
+    await prefs.setStringList('groupItemDescriptions', _groupItemDescriptions);
   }
 
   void _removeItem(int index) async {
     setState(() {
-      _sharedItems.removeAt(index);
-      _sharedDescriptions.removeAt(index);
+      _groupItems.removeAt(index);
+      _groupItemDescriptions.removeAt(index);
     });
-    await prefs.setStringList('_sharedItems', _sharedItems);
-    await prefs.setStringList('_sharedDescriptions', _sharedDescriptions);
+    await prefs.setStringList('groupItems', _groupItems);
+    await prefs.setStringList('groupItemDescriptions', _groupItemDescriptions);
   }
 
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      return Center(child: CircularProgressIndicator()); // 로딩 인디케이터 중앙 정렬
+      return Center(child: CircularProgressIndicator());
     }
     return Scaffold(
       appBar: AppBar(
         title: Text('그룹 목록'),
       ),
       body: ListView.builder(
-        itemCount: _sharedItems.length,
+        itemCount: _groupItems.length,
         itemBuilder: (context, index) {
           return Card(
-            elevation: 3, // 그림자 효과
+            elevation: 3,
             margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: ListTile(
-              leading: Icon(Icons.share),
+              leading: Icon(Icons.compare),
               title: Text(
-                _sharedItems[index],
+                _groupItems[index],
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(_sharedDescriptions[index]),
+              subtitle: Text(_groupItemDescriptions[index]),
               trailing: IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
-                  // 삭제 모달 표시
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -80,17 +79,16 @@ class _TabBarScreenState extends State<TabBarScreen> {
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // 모달 닫기
+                              Navigator.of(context).pop();
                             },
                             child: Text("취소"),
                           ),
                           TextButton(
                             onPressed: () {
-                              // 항목 삭제
                               setState(() {
                                 _removeItem(index);
                               });
-                              Navigator.of(context).pop(); // 모달 닫기
+                              Navigator.of(context).pop();
                             },
                             child: Text("삭제"),
                           ),

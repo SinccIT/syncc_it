@@ -64,7 +64,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             elevation: 3,
             margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: ListTile(
-              leading: Icon(Icons.share),
+              leading: Icon(Icons.people),
               title: Text(
                 _contactItems[index],
                 style: TextStyle(fontWeight: FontWeight.bold),
