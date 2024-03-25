@@ -10,13 +10,13 @@ void main() async {
   // Shared Preference 인스턴스 생성
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
+
   runApp(
     DataProvider(
       dataModel: DataModel(),
       child: const MyApp(),
     ),
   );
-}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key});
@@ -29,4 +29,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

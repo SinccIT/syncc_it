@@ -11,10 +11,15 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// 상태 클래스
-class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
 
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +211,7 @@ class _HomePageState extends State<HomePage> {
         selectedItemColor: Color(0xFF27F39D), // 선택된 항목의 색상
         unselectedItemColor: Color(0xFFC8C8C8), // 선택되지 않은 항목의 색상
         showUnselectedLabels: true,
+
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
