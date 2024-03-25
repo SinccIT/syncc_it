@@ -28,7 +28,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
     });
   }
 
-  void _addItemToContacts(String item, String description) async {
+  void _addItemToContacts(String item, String description, String tags) async {
     setState(() {
       _contactItems.add(item);
       _contactItemDescriptions.add(description);
@@ -122,7 +122,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
 }
 
 class AddContactScreen1 extends StatefulWidget {
-  final Function(String, String) onAdd;
+  final Function(String, String, String) onAdd;
 
   const AddContactScreen1({Key? key, required this.onAdd}) : super(key: key);
 
@@ -131,20 +131,23 @@ class AddContactScreen1 extends StatefulWidget {
 }
 
 class _AddContactScreenState1 extends State<AddContactScreen1> {
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
+  late TextEditingController _nameController1;
+  late TextEditingController _descriptionController1;
+  late TextEditingController _tagsController; // 태그 입력 필드 컨트롤러 추가
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
-    _descriptionController = TextEditingController();
+    _nameController1 = TextEditingController();
+    _descriptionController1 = TextEditingController();
+    _tagsController = TextEditingController(); // 컨트롤러 초기화
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
+    _nameController1.dispose();
+    _descriptionController1.dispose();
+    _tagsController.dispose(); // 컨트롤러 해제
     super.dispose();
   }
 
@@ -152,37 +155,76 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('연락처 추가'),
+        title: Text('그룹 추가'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 8,
               ),
-            ),
-            SizedBox(height: 12.0),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Description',
+              // 프로필 영역
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // 프로필 이미지
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Container(
+                        padding: EdgeInsets.all(20), // 테두리와 아이콘 사이의 간격을 설정합니다.
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle, // 동그라미 모양의 테두리를 만듭니다.
+                          color: Colors.grey, // 원의 색상을 설정합니다.
+                        ),
+                        child: Icon(
+                          Icons.work, // 아이콘을 선택합니다.
+                          size: 100, // 아이콘의 크기를 조정합니다.
+                          color: Colors.white, // 아이콘의 색상을 설정합니다.
+                        ),
+                      ),
+                    ),
+
+                    TextField(
+                      controller: _nameController1,
+                      decoration: InputDecoration(
+                        labelText: 'Group Name',
+                      ),
+                    ),
+                    SizedBox(height: 12.0),
+                    TextField(
+                      controller: _descriptionController1,
+                      decoration: InputDecoration(
+                        labelText: 'Group Description',
+                      ),
+                    ),
+                    SizedBox(height: 12.0),
+                    TextField(
+                      controller: _tagsController,
+                      decoration: InputDecoration(
+                        labelText: 'Tags',
+                      ),
+                    ),
+                    SizedBox(height: 12.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        final name = _nameController1.text;
+                        final description = _descriptionController1.text;
+                        final tags = _tagsController.text;
+                        widget.onAdd(name, description, tags);
+                        Navigator.pop(context);
+                      },
+                      child: Text('Save'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 24.0),
-            ElevatedButton(
-              onPressed: () {
-                final name = _nameController.text;
-                final description = _descriptionController.text;
-                widget.onAdd(name, description);
-                Navigator.pop(context);
-              },
-              child: Text('Save'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
