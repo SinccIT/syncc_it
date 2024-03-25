@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncc_it/home_page.dart';
 
 class ContactsScreen extends StatefulWidget {
+  final int selectedIndex;
+  final void Function(int index) onItemTapped;
+
+  const ContactsScreen({Key? key, required this.selectedIndex, required this.onItemTapped}) : super(key: key);
+
   @override
   _ContactsScreenState createState() => _ContactsScreenState();
 }
@@ -11,6 +17,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   late List<String> _contactItems;
   late List<String> _contactItemDescriptions;
   late bool _initialized = false;
+  int _selectedIndex = 2;
 
   @override
   void initState() {
@@ -54,9 +61,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
       return Center(child: CircularProgressIndicator());
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Text('연락처 목록'),
-      ),
+      appBar: CustomAppBar(),
+
       body: ListView.builder(
         itemCount: _contactItems.length,
         itemBuilder: (context, index) {
@@ -117,6 +123,17 @@ class _ContactsScreenState extends State<ContactsScreen> {
         },
         child: Icon(Icons.add),
       ),
+
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index; // 선택된 인덱스 업데이트
+          });
+          widget.onItemTapped(index); // 전달된 콜백 함수 호출
+        },
+      ),
+
     );
   }
 }
@@ -151,9 +168,8 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('연락처 추가'),
-      ),
+      appBar: CustomAppBar(),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -185,6 +201,7 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
           ],
         ),
       ),
+
     );
   }
 }

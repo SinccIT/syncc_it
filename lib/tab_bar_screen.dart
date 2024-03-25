@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncc_it/home_page.dart';
 
 class TabBarScreen extends StatefulWidget {
+  final int selectedIndex;
+  final void Function(int index) onItemTapped;
+
+  const TabBarScreen({Key? key, required this.selectedIndex, required this.onItemTapped}) : super(key: key);
+
   @override
   _TabBarScreenState createState() => _TabBarScreenState();
 }
 
+// 상태 클래스
 class _TabBarScreenState extends State<TabBarScreen> {
   late SharedPreferences prefs;
   late List<String> _groupItems;
   late List<String> _groupItemDescriptions;
   late bool _initialized = false;
+  int _selectedIndex = 1;
 
   @override
   void initState() {
@@ -51,9 +59,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
       return Center(child: CircularProgressIndicator());
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Text('그룹 목록'),
-      ),
+      appBar: CustomAppBar(),
+
       body: ListView.builder(
         itemCount: _groupItems.length,
         itemBuilder: (context, index) {
@@ -102,6 +109,7 @@ class _TabBarScreenState extends State<TabBarScreen> {
           );
         },
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -113,6 +121,17 @@ class _TabBarScreenState extends State<TabBarScreen> {
         },
         child: Icon(Icons.add),
       ),
+
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index; // 선택된 인덱스 업데이트
+          });
+          widget.onItemTapped(index); // 전달된 콜백 함수 호출
+        },
+      ),
+
     );
   }
 }
@@ -147,9 +166,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('그룹 추가'),
-      ),
+
+      appBar: CustomAppBar(),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -181,6 +200,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
           ],
         ),
       ),
+
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'contact_page.dart';
+import 'package:syncc_it/message_screen.dart';
+import 'package:syncc_it/tab_bar_screen.dart';
+import 'contact_screen.dart';
 import 'data_model.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,14 +13,68 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-
+// 상태 클래스
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool _mounted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _mounted = true;
+  }
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    switch(index) {
+        case 0:
+          // Home 탭
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 1:
+          // 그룹 탭
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => TabBarScreen(
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+            )),
+          );
+          break;
+        case 2:
+          // 연락처 탭
+          Navigator.pushReplacement(
+            context,
+            // MaterialPageRoute(builder: (context) => ContactPage(data: data)),
+              MaterialPageRoute(builder: (context) => ContactsScreen(
+                selectedIndex: _selectedIndex,
+                onItemTapped: _onItemTapped,
+              )),
+          );
+          break;
+        case 3:
+          // 메시지 탭
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MessageScreen(
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+            )),
+          );
+          break;
+      }
   }
 
   @override
@@ -27,28 +83,7 @@ class _HomePageState extends State<HomePage> {
     final data = DataProvider.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF27F39D),
-        title: Text(
-          'SynccIT',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: Icon(
-          Icons.menu,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(CupertinoIcons.search),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(CupertinoIcons.person),
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(),
 
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -200,72 +235,100 @@ class _HomePageState extends State<HomePage> {
                 );
               },
 
+
             ),
           ),
         ],
       ),
 
-      // bottom navigation bar
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF313034),
-        selectedItemColor: Color(0xFF27F39D), // 선택된 항목의 색상
-        unselectedItemColor: Color(0xFFC8C8C8), // 선택되지 않은 항목의 색상
-        showUnselectedLabels: true,
-
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: '그룹',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.contact_phone),
-            label: '연락처',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: '메시지',
-          ),
-        ],
-        onTap: (value) {
-          setState(() {
-            switch(value) {
-              case 0:
-              // Home 탭
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-                break;
-              case 1:
-              // 그룹 탭
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-                break;
-              case 2:
-              // 연락처 탭
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ContactPage(data: data)),
-                );
-                break;
-              case 3:
-              // 메시지 탭
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-                break;
-            }
-          });
-        },
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
 
     );
+  }
+}
+
+// app bar
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Color(0xFF27F39D),
+      title: Text(
+        'SynccIT',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      leading: Icon(
+        Icons.menu,
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: Icon(CupertinoIcons.search),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: Icon(CupertinoIcons.person),
+        ),
+      ],
+    );
+  }
+}
+
+// bottom navigation bar
+class CustomBottomNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const CustomBottomNavigationBar({Key? key, required this.currentIndex, required this.onTap}) : super(key: key);
+
+  // BottomNavigationBarItem을 생성하는 함수
+  BottomNavigationBarItem _buildItem(IconData icon, String label, bool isSelected) {
+    return BottomNavigationBarItem(
+      icon: Icon(icon, color: Colors.grey), // 기본 색상은 회색으로 설정
+      activeIcon: Icon(icon, color: Colors.white), // 선택된 아이콘 색상은 흰색으로 설정
+      label: label,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      backgroundColor: Color(0xFF313034),
+      type: BottomNavigationBarType.fixed,
+      currentIndex: currentIndex,
+      items: <BottomNavigationBarItem>[
+        _buildItem(
+          Icons.home,
+          'Home',
+          currentIndex == 0,
+        ),
+        _buildItem(
+          Icons.people,
+          '그룹',
+          currentIndex == 1,
+        ),
+        _buildItem(
+          Icons.call,
+          '연락처',
+          currentIndex == 2,
+        ),
+        _buildItem(
+          Icons.message,
+          '메시지',
+          currentIndex == 3,
+        ),
+      ],
+      onTap: onTap,
+    );
+
   }
 }
