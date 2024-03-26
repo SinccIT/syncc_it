@@ -3,13 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncc_it/data_model.dart';
 import 'package:syncc_it/home_page.dart';
 
+import 'join.dart';
+
 void main() async {
   // main()에서 async 사용
   WidgetsFlutterBinding.ensureInitialized();
 
   // Shared Preference 인스턴스 생성
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
 
   runApp(
     DataProvider(
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: JoinPage(),
     );
   }
 }

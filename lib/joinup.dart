@@ -19,6 +19,7 @@ class JoinUpPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: 25), // 간격 조절
                 Text(
                   '반갑습니다.',
                   style: TextStyle(
@@ -28,7 +29,7 @@ class JoinUpPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '이름과 소속을 입력 해주세요',
+                  '가입 정보를 입력 해주세요',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -41,6 +42,36 @@ class JoinUpPage extends StatelessWidget {
                   children: [
                     Text(
                       '이름',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    TextFieldContainer(),
+                  ],
+                ),
+                SizedBox(height: 10), // 각 입력 라인 사이의 간격 조절
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '이메일',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    TextFieldContainer(),
+                  ],
+                ),
+                SizedBox(height: 10), // 각 입력 라인 사이의 간격 조절
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '비밀번호',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -163,7 +194,7 @@ class TextFieldContainer extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 10.0),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(width: 1.0, color: Colors.black), // 입력칸 밑에 라인 추가
+          bottom: BorderSide(width: 1.0, color: Colors.grey), // 입력칸 밑에 라인 추가
         ),
       ),
       child: TextField(
