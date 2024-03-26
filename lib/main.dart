@@ -7,6 +7,8 @@ import 'package:syncc_it/auth_service.dart';
 
 import 'login.dart';
 
+import 'join.dart';
+
 void main() async {
   // main()에서 async 사용
   WidgetsFlutterBinding.ensureInitialized();
