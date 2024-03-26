@@ -3,23 +3,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncc_it/home_page.dart';
 
 void main() async {
-  // main()에서 async 사용
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Shared Preference 인스턴스 생성
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  runApp(const MyApp());
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final SharedPreferences prefs;
+  const MyApp({Key? key, required this.prefs}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: HomePage(prefs: prefs),
     );
   }
 }

@@ -1,3 +1,5 @@
+// view_profile.dart 파일
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class ViewProfile extends StatelessWidget {
@@ -7,6 +9,7 @@ class ViewProfile extends StatelessWidget {
   final String id;
   final String phoneNumber;
   final String contactTime;
+  final String profileImage;
 
   const ViewProfile({
     required this.name,
@@ -15,23 +18,26 @@ class ViewProfile extends StatelessWidget {
     required this.id,
     required this.phoneNumber,
     required this.contactTime,
-  });
+    required this.profileImage,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('View Profile'), // 수정: 헤더 추가
-      ),
+      appBar: AppBar(title: Text('View Profile')),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20.0),
         child: ListView(
           children: <Widget>[
+            SizedBox(height: 20),
             Center(
               child: CircleAvatar(
                 radius: 80,
-                backgroundImage:
-                    AssetImage('images/profile.png'), // 수정: 프로필 사진 표시
+                backgroundImage: profileImage.isNotEmpty &&
+                        File(profileImage).existsSync() // 수정: File 사용
+                    ? Image.file(File(profileImage)).image // 수정: Image.file 사용
+                    : AssetImage('images/profile.png'),
               ),
             ),
             SizedBox(height: 20),

@@ -1,9 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:syncc_it/profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncc_it/view_profile.dart';
+import 'package:syncc_it/profile.dart'; // MyProfile을 import합니다.
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key});
+  final SharedPreferences prefs;
+  const HomePage({Key? key, required this.prefs}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,15 +24,35 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(CupertinoIcons.search),
+            icon: Icon(Icons.search),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(CupertinoIcons.person),
+            icon: Icon(Icons.person),
           ),
         ],
       ),
-      body: MyProfile(),
+      body: ViewProfile(
+        name: '이름',
+        intro: '안녕하세요. 반갑습니다.',
+        email: 'example@example.com',
+        id: 'example_id',
+        phoneNumber: '010-1234-5678',
+        contactTime: '-',
+        profileImage: '', // 프로필 이미지 파일 경로
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  MyProfile(prefs: prefs), // 수정: MyProfile로 변경
+            ),
+          );
+        },
+        child: Icon(Icons.edit),
+      ),
     );
   }
 }

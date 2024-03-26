@@ -1,22 +1,22 @@
-import 'dart:io';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'view_profile.dart'; // 새로운 페이지 파일 추가
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyProfile());
-}
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+import 'view_profile.dart';
 
 class MyProfile extends StatefulWidget {
-  const MyProfile({Key? key}) : super(key: key);
+  final SharedPreferences prefs;
+
+  const MyProfile({Key? key, required this.prefs}) : super(key: key);
 
   @override
   _MyProfileState createState() => _MyProfileState();
 }
 
 class _MyProfileState extends State<MyProfile> {
-  PickedFile? _imageFile;
+  XFile? _imageFile;
   final ImagePicker _picker = ImagePicker();
 
   final _items = [
@@ -31,156 +31,152 @@ class _MyProfileState extends State<MyProfile> {
   ];
   var _selected = '9am-10am';
 
-  List<String> _selectedContactTimes = [];
-
-  String _name = '박채연';
-  String _intro = '안녕하세요. 반갑습니다.';
-  String _email = 'example@example.com';
-  String _id = 'example_id';
-  String _phoneNumber = '010-1234-5678';
-
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _introController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _idController = TextEditingController();
-  TextEditingController _phoneNumberController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _introController;
+  late TextEditingController _emailController;
+  late TextEditingController _idController;
+  late TextEditingController _phoneNumberController;
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = _name;
-    _introController.text = _intro;
-    _emailController.text = _email;
-    _idController.text = _id;
-    _phoneNumberController.text = _phoneNumber;
+    _nameController =
+        TextEditingController(text: widget.prefs.getString('name') ?? '');
+    _introController =
+        TextEditingController(text: widget.prefs.getString('intro') ?? '');
+    _emailController =
+        TextEditingController(text: widget.prefs.getString('email') ?? '');
+    _idController =
+        TextEditingController(text: widget.prefs.getString('id') ?? '');
+    _phoneNumberController = TextEditingController(
+        text: widget.prefs.getString('phoneNumber') ?? '');
+    _selected = widget.prefs.getString('selectedContactTime') ?? '9am-10am';
+    String? imagePath = widget.prefs.getString('profileImage');
+    if (imagePath != null) {
+      _imageFile = XFile(imagePath);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Profile'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          child: ListView(
-            children: <Widget>[
-              imageProfile(context),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  _editName();
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _name,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              GestureDetector(
-                onTap: () {
-                  _editIntro();
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _intro,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    Icon(Icons.edit, size: 20),
-                  ],
-                ),
-              ),
-              SizedBox(height: 50),
-              nameTextFieldWithIcon('ID', _idController, Icons.edit),
-              SizedBox(height: 20),
-              nameTextFieldWithIcon('E-MAIL', _emailController, Icons.edit),
-              SizedBox(height: 20),
-              nameTextFieldWithIcon(
-                  'Phone Number', _phoneNumberController, Icons.edit),
-              SizedBox(height: 50),
-              buildContactTimeDropdown(),
-              SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: () {
-                  // 저장 버튼 클릭 시 변경된 정보를 저장하고 조회 페이지로 이동
-                  _saveAndNavigateToViewProfile(context);
-                },
-                child: Text('저장'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // 조회 페이지로 이동
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ViewProfile(
-                        name: _name,
-                        intro: _intro,
-                        email: _email,
-                        id: _id,
-                        phoneNumber: _phoneNumber,
-                        contactTime: _selected,
-                      ),
-                    ),
-                  );
-                },
-                child: Text('프로필 보기'),
-              ),
-            ],
-          ),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profile'),
       ),
-    );
-  }
-
-  Widget imageProfile(BuildContext context) {
-    return Center(
-      child: Stack(
-        children: <Widget>[
-          CircleAvatar(
-            radius: 80,
-            backgroundImage: _imageFile == null
-                ? AssetImage('images/profile.png') as ImageProvider<Object>?
-                : FileImage(File(_imageFile!.path)),
-          ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: InkWell(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        child: ListView(
+          children: <Widget>[
+            imageProfile(context),
+            SizedBox(height: 20),
+            GestureDetector(
               onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: ((builder) => bottomSheet(context)),
-                );
+                _editName();
               },
-              child: Icon(
-                Icons.camera_alt,
-                size: 40,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _nameController.text,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Icon(Icons.edit, size: 20),
+                ],
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                _editIntro();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _introController.text,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Icon(Icons.edit, size: 20),
+                ],
+              ),
+            ),
+            SizedBox(height: 50),
+            nameTextFieldWithIcon('ID', _idController, Icons.edit),
+            SizedBox(height: 20),
+            nameTextFieldWithIcon('E-MAIL', _emailController, Icons.edit),
+            SizedBox(height: 20),
+            nameTextFieldWithIcon(
+                'Phone Number', _phoneNumberController, Icons.edit),
+            SizedBox(height: 50),
+            buildContactTimeDropdown(),
+            SizedBox(height: 50),
+            ElevatedButton(
+              onPressed: () {
+                _saveAndNavigateToViewProfile(context);
+              },
+              child: Text('저장'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewProfile(
+                      name: _nameController.text,
+                      intro: _introController.text,
+                      email: _emailController.text,
+                      id: _idController.text,
+                      phoneNumber: _phoneNumberController.text,
+                      contactTime: _selected,
+                      profileImage: _imageFile?.path ?? '',
+                    ),
+                  ),
+                );
+              },
+              child: Text('프로필 보기'),
+            )
+          ],
+        ),
       ),
     );
   }
 
-  Widget bottomSheet(BuildContext context) {
+  void takePhoto() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = pickedFile;
+      });
+
+      await _saveImageToGallery(pickedFile.path);
+      Navigator.pop(context);
+    }
+  }
+
+  Future<void> _saveImageToGallery(String imagePath) async {}
+
+  void chooseImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = pickedFile;
+      });
+      Navigator.pop(context);
+    }
+  }
+
+  Widget _buildBottomSheet(BuildContext context) {
     return Container(
       height: 200,
       width: MediaQuery.of(context).size.width,
@@ -201,9 +197,7 @@ class _MyProfileState extends State<MyProfile> {
               Expanded(
                 child: TextButton.icon(
                   icon: Icon(Icons.camera, size: 50),
-                  onPressed: () {
-                    takePhoto(ImageSource.camera);
-                  },
+                  onPressed: takePhoto,
                   label: Text(
                     'Camera',
                     style: TextStyle(fontSize: 20),
@@ -212,14 +206,15 @@ class _MyProfileState extends State<MyProfile> {
               ),
               SizedBox(width: 20),
               Expanded(
-                child: TextButton.icon(
-                  icon: Icon(Icons.photo_library, size: 50),
-                  onPressed: () {
-                    takePhoto(ImageSource.gallery);
-                  },
-                  label: Text(
-                    'Gallery',
-                    style: TextStyle(fontSize: 20),
+                child: SizedBox(
+                  height: 60, // 아이콘의 위치 조정
+                  child: TextButton.icon(
+                    icon: Icon(Icons.photo_library, size: 50),
+                    onPressed: chooseImage,
+                    label: Text(
+                      'Gallery',
+                      style: TextStyle(fontSize: 20),
+                    ),
                   ),
                 ),
               ),
@@ -230,14 +225,52 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  void takePhoto(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = PickedFile(pickedFile.path);
-      });
-      Navigator.pop(context); // bottomSheet를 닫음
-    }
+  Widget imageProfile(BuildContext context) {
+    return Center(
+      child: Stack(
+        children: <Widget>[
+          CircleAvatar(
+            radius: 80,
+            backgroundImage: _imageFile == null
+                ? AssetImage('images/profile.png') as ImageProvider<Object>?
+                : FileImage(File(_imageFile!.path)),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: InkWell(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: ((builder) => _buildBottomSheet(context)),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Icon(
+                    Icons.camera_alt,
+                    size: 40,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget nameTextField(String labelText, TextEditingController controller) {
@@ -246,7 +279,8 @@ class _MyProfileState extends State<MyProfile> {
       decoration: InputDecoration(
         labelText: labelText,
         border: OutlineInputBorder(),
-        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        contentPadding:
+            EdgeInsets.symmetric(vertical: 10, horizontal: 15), // 수정된 부분
       ),
     );
   }
@@ -265,6 +299,8 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Widget buildContactTimeDropdown() {
+    List<String> contactTimeOptions = ['상관없음'] + _items; // "상관없음" 옵션을 추가합니다.
+
     return Container(
       width: 200, // 버튼의 너비 조정
       child: DropdownButtonFormField<String>(
@@ -278,7 +314,7 @@ class _MyProfileState extends State<MyProfile> {
             _selected = newValue!;
           });
         },
-        items: _items.map((String value) {
+        items: contactTimeOptions.map((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
@@ -293,7 +329,7 @@ class _MyProfileState extends State<MyProfile> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit Name'),
+          title: Text('이름 입력'),
           content: TextField(
             controller: _nameController,
             decoration: InputDecoration(hintText: "Enter your name"),
@@ -302,11 +338,11 @@ class _MyProfileState extends State<MyProfile> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  _name = _nameController.text;
+                  _nameController.text = _nameController.text;
                 });
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: Text('저장'),
             ),
           ],
         );
@@ -319,7 +355,7 @@ class _MyProfileState extends State<MyProfile> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit Introduction'),
+          title: Text('한줄 소개'),
           content: TextField(
             controller: _introController,
             decoration: InputDecoration(hintText: "Enter your introduction"),
@@ -328,11 +364,11 @@ class _MyProfileState extends State<MyProfile> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  _intro = _introController.text;
+                  _introController.text = _introController.text;
                 });
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: Text('저장'),
             ),
           ],
         );
@@ -340,59 +376,34 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  void _saveChanges() {
-    // 변경된 정보를 콘솔에 출력
-    print('Name: ${_nameController.text}');
-    print('Introduction: ${_introController.text}');
-    print('Selected Dropdown Item: $_selected');
-    print('ID: ${_idController.text}');
-    print('E-mail: ${_emailController.text}');
-    print('Phone Number: ${_phoneNumberController.text}');
-
-    // 변경된 정보를 저장할 변수에 저장
-    String newName = _nameController.text;
-    String newIntro = _introController.text;
-    String newSelected = _selected;
-    String newId = _idController.text;
-    String newEmail = _emailController.text;
-    String newPhoneNumber = _phoneNumberController.text;
-
-    // 여기에 변경된 정보를 데이터베이스나 파일에 저장하는 로직을 추가
-    // 예를 들어, 데이터베이스에 저장하는 경우:
-    // databaseService.updateUserProfile(newName, newIntro, newSelected, newId, newEmail, newPhoneNumber);
-
-    // 저장 후에는 사용자에게 저장되었음을 알리는 메시지를 표시할 수 있습니다.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('수정 완료!'),
-      ),
-    );
-
-    // 변경된 정보를 표시하기 위해 화면을 다시 빌드합니다.
-    setState(() {
-      // 변경된 정보를 반영하여 화면을 다시 그리는 로직을 추가합니다.
-      _name = newName;
-      _intro = newIntro;
-      _selected = newSelected;
-      _id = newId;
-      _email = newEmail;
-      _phoneNumber = newPhoneNumber;
-    });
+  void _saveChanges() async {
+    // 수정된 정보를 SharedPreferences에 저장합니다.
+    await widget.prefs.setString('name', _nameController.text);
+    await widget.prefs.setString('intro', _introController.text);
+    await widget.prefs.setString('email', _emailController.text);
+    await widget.prefs.setString('id', _idController.text);
+    await widget.prefs.setString('phoneNumber', _phoneNumberController.text);
+    await widget.prefs.setString('selectedContactTime', _selected);
+    // 이미지 파일 경로를 저장합니다.
+    if (_imageFile != null) {
+      await widget.prefs.setString('profileImage', _imageFile!.path);
+    }
   }
 
+  // 수정된 정보를 저장하고 ViewProfile 페이지로 이동하는 함수
   void _saveAndNavigateToViewProfile(BuildContext context) {
-    // 저장 버튼 클릭 시 변경된 정보를 저장하고 조회 페이지로 이동
-    _saveChanges();
+    _saveChanges(); // 수정된 정보를 저장하는 함수 호출
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ViewProfile(
-          name: _name,
-          intro: _intro,
-          email: _email,
-          id: _id,
-          phoneNumber: _phoneNumber,
+          name: _nameController.text,
+          intro: _introController.text,
+          email: _emailController.text,
+          id: _idController.text,
+          phoneNumber: _phoneNumberController.text,
           contactTime: _selected,
+          profileImage: _imageFile?.path ?? '',
         ),
       ),
     );
