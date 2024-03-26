@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:syncc_it/widgets/check.dart';
-
-import 'joinup.dart'; // 위젯이 정의된 파일을 가져옴
+import 'auth_service.dart';
+import 'joinup.dart';
+import 'login.dart'; // 위젯이 정의된 파일을 가져옴
 
 // JoinPage 위젯을 StatelessWidget으로 정의.
 class JoinPage extends StatelessWidget {
+  final AuthService authService;
+  JoinPage({required this.authService}); // authService를 초기화하는 생성자
+
   List<bool> isCheckedList = [
     false,
     false,
@@ -37,6 +41,13 @@ class JoinPage extends StatelessWidget {
                   child: TextButton(
                     onPressed: () {
                       // 로그인 버튼 클릭 시 동작할 내용 추가
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LoginPage(
+                                  name: '',
+                                )), // LoginPage로 이동
+                      );
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
@@ -189,8 +200,12 @@ class JoinPage extends StatelessWidget {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        JoinUpPage()),
+                                                  builder: (context) =>
+                                                      JoinUpPage(
+                                                    authService: authService,
+                                                    name: '',
+                                                  ),
+                                                ),
                                               );
                                             },
                                             style: ButtonStyle(
