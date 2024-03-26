@@ -155,11 +155,11 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('그룹 추가'),
+        title: Text('연락처 추가'),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(32.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -168,7 +168,7 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
               ),
               // 프로필 영역
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24.0),
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -182,7 +182,7 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
                           color: Colors.grey, // 원의 색상을 설정합니다.
                         ),
                         child: Icon(
-                          Icons.work, // 아이콘을 선택합니다.
+                          Icons.person_2, // 아이콘을 선택합니다.
                           size: 100, // 아이콘의 크기를 조정합니다.
                           color: Colors.white, // 아이콘의 색상을 설정합니다.
                         ),
@@ -192,21 +192,14 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
                     TextField(
                       controller: _nameController1,
                       decoration: InputDecoration(
-                        labelText: 'Group Name',
+                        labelText: 'Name',
                       ),
                     ),
                     SizedBox(height: 12.0),
                     TextField(
                       controller: _descriptionController1,
                       decoration: InputDecoration(
-                        labelText: 'Group Description',
-                      ),
-                    ),
-                    SizedBox(height: 12.0),
-                    TextField(
-                      controller: _tagsController,
-                      decoration: InputDecoration(
-                        labelText: 'Tags',
+                        labelText: 'PhoneNumber',
                       ),
                     ),
                     SizedBox(height: 12.0),

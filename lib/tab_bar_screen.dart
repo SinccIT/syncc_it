@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syncc_it/tab_bar_screen1.dart';
 
-import 'group_detail.dart';
+import 'group_item.dart';
 
 class TabBarScreen extends StatefulWidget {
   @override
@@ -14,6 +13,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
   late List<String> _groupItems;
   late List<String> _groupItemDescriptions;
   late List<String> _groupItemTags;
+  late List<String> _selectedContacts = [];
+
   late bool _initialized = false;
 
   @override
@@ -32,15 +33,19 @@ class _TabBarScreenState extends State<TabBarScreen> {
     });
   }
 
-  void _addItem(String item, String description, String tags) async {
+  void _addItem(String item, String description, String tags,
+      List<String> selectedMembers) async {
     setState(() {
       _groupItems.add(item);
       _groupItemDescriptions.add(description);
       _groupItemTags.add(tags);
+      _selectedContacts.addAll(selectedMembers); // 선택된 멤버 목록을 추가합니다.
     });
     await prefs.setStringList('groupItems', _groupItems);
     await prefs.setStringList('groupItemDescriptions', _groupItemDescriptions);
     await prefs.setStringList('groupItemTags', _groupItemTags);
+    await prefs.setStringList(
+        'selectedContacts', _selectedContacts); // 선택된 멤버 목록을 저장합니다.
   }
 
   void _removeItem(int index) async {
@@ -85,6 +90,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
                       groupName: _groupItems[index],
                       groupDescription: _groupItemDescriptions[index],
                       groupTags: _groupItemTags[index],
+                      selectedMembers:
+                          _selectedContacts, // Pass the actual list of selected members
                     ),
                   ),
                 );
@@ -109,7 +116,7 @@ class _TabBarScreenState extends State<TabBarScreen> {
                           TextButton(
                             onPressed: () {
                               setState(() {
-                                _removeItem(index);
+                                _removeItem(index); // 항목 삭제
                               });
                               Navigator.of(context).pop();
                             },
@@ -141,7 +148,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
 }
 
 class AddContactScreen extends StatefulWidget {
-  final Function(String, String, String) onAdd;
+  final Function(String, String, String, List<String>)
+      onAdd; // 선택된 멤버 목록을 추가합니다.
 
   const AddContactScreen({Key? key, required this.onAdd}) : super(key: key);
 
@@ -153,7 +161,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   late TextEditingController _tagsController;
-  final List<String> _selectedContacts = []; // List to store selected contacts
+  late List<String> _selectedContacts = []; // _selectedContacts 필드 추가 및 초기화
+  late SharedPreferences _prefs;
+  late List<String> _contacts;
 
   @override
   void initState() {
@@ -161,34 +171,18 @@ class _AddContactScreenState extends State<AddContactScreen> {
     _nameController = TextEditingController();
     _descriptionController = TextEditingController();
     _tagsController = TextEditingController();
+    _initSharedPreferences(); // Initialize SharedPreferences
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _tagsController.dispose();
-    super.dispose();
+  // Initialize SharedPreferences and fetch contacts
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    _contacts = _prefs.getStringList('contactItems') ?? [];
   }
 
   // Method to fetch contacts - Replace this with your actual contact fetching logic
   Future<List<String>> _fetchContacts() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? contactItems = prefs.getStringList('contactItems');
-    List<String>? contactItemDescriptions =
-        prefs.getStringList('contactItemDescriptions');
-
-    if (contactItems != null && contactItemDescriptions != null) {
-      // Combine contact items with descriptions
-      List<String> contacts = [];
-      for (int i = 0; i < contactItems.length; i++) {
-        contacts.add('${contactItems[i]}');
-      }
-      return contacts;
-    } else {
-      // Return an empty list if no contacts are found
-      return [];
-    }
+    return _contacts;
   }
 
   void _saveContact() async {
@@ -199,8 +193,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
     // Perform any validation here before saving
     // For simplicity, let's assume all fields are required
 
-    // Call the callback function to add the contact
-    widget.onAdd(name, description, tags);
+    // Pass selected members along with other details
+    widget.onAdd(name, description, tags, _selectedContacts); // 추가된 멤버를 전달합니다.
 
     // Clear text fields after saving
     _nameController.clear();
@@ -225,19 +219,19 @@ class _AddContactScreenState extends State<AddContactScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(32.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: CircleAvatar(
-                  radius: 70,
+                  radius: 100,
                   backgroundImage: NetworkImage(
                       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D'),
                 ),
               ),
               SizedBox(
-                  height: 16.0), // Add some spacing below the profile image
+                  height: 32.0), // Add some spacing below the profile image
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -267,35 +261,61 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                        title: Text("멤버 추가"),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: contacts.map((contact) {
-                              return ListTile(
-                                title: Text(contact),
-                                onTap: () {
-                                  setState(() {
-                                    _selectedContacts.add(contact);
-                                  });
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return AlertDialog(
+                            title: Text("멤버 추가"),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: contacts.map((contact) {
+                                  bool isSelected =
+                                      _selectedContacts.contains(contact);
+                                  return CheckboxListTile(
+                                    title: Text(contact),
+                                    value: isSelected,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        if (newValue!) {
+                                          _selectedContacts.add(
+                                              contact); // Add contact when checked
+                                        } else {
+                                          _selectedContacts.remove(
+                                              contact); // Remove contact when unchecked
+                                        }
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
                                   Navigator.of(context).pop();
                                 },
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("취소"),
-                          ),
-                        ],
+                                child: Text("취소"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // Close dialog and pass selected contacts
+                                  Navigator.of(context).pop(_selectedContacts);
+                                },
+                                child: Text("확인"),
+                              ),
+                            ],
+                          );
+                        },
                       );
                     },
-                  );
+                  ).then((selectedContacts) {
+                    // Update selected contacts on dialog close
+                    if (selectedContacts != null) {
+                      setState(() {
+                        _selectedContacts = List.from(selectedContacts);
+                      });
+                    }
+                  });
                 },
                 child: Text('멤버 추가'),
               ),
@@ -303,18 +323,59 @@ class _AddContactScreenState extends State<AddContactScreen> {
               // Display selected contacts
               Wrap(
                 children: _selectedContacts.map((contact) {
-                  return Chip(
-                    label: Text(contact),
-                    onDeleted: () {
-                      setState(() {
-                        _selectedContacts.remove(contact);
-                      });
-                    },
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Chip(
+                      label: Text(contact),
+                      onDeleted: () {
+                        setState(() {
+                          _selectedContacts.remove(contact);
+                        });
+                      },
+                    ),
                   );
                 }).toList(),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// 이 위치에 상세조회 페이지 클래스를 추가합니다.
+class GroupDetailScreen extends StatelessWidget {
+  final String groupName;
+  final String groupDescription;
+  final String groupTags;
+  final List<String> selectedMembers;
+
+  const GroupDetailScreen({
+    required this.groupName,
+    required this.groupDescription,
+    required this.groupTags,
+    required this.selectedMembers,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // 상세조회 페이지의 UI를 구성하는 코드를 작성합니다.
+    // 예를 들어, Scaffold를 사용하여 페이지를 구성하고,
+    // groupName, groupDescription, groupTags, selectedMembers 등을 표시합니다.
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Group Detail'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Group Name: $groupName'),
+            Text('Description: $groupDescription'),
+            Text('Tags: $groupTags'),
+            Text('Selected Members: ${selectedMembers.join(', ')}'),
+          ],
         ),
       ),
     );
