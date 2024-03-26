@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'contact_page.dart';
+import 'package:syncc_it/tab_bar_screen1.dart';
 import 'data_model.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,7 +10,6 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
@@ -67,7 +66,8 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: CircleAvatar(
                     radius: 52,
-                    backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D'),
+                    backgroundImage: NetworkImage(
+                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D'),
                   ),
                 ),
                 // 닉네임
@@ -94,11 +94,10 @@ class _HomePageState extends State<HomePage> {
             child: Consumer<DataModel>(
               builder: (context, data, child) {
                 return ListView.builder(
-
-                  itemCount: data.groupList.length + data.contactList.length + 4,
+                  itemCount:
+                      data.groupList.length + data.contactList.length + 4,
                   itemBuilder: (context, index) {
-
-                    if(index == 0) {
+                    if (index == 0) {
                       // divider
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -107,7 +106,6 @@ class _HomePageState extends State<HomePage> {
                           color: Color(0xFFEEEEEE),
                         ),
                       );
-
                     } else if (index == 1) {
                       // 그룹 라벨
                       return Padding(
@@ -120,10 +118,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       );
-
-                    } else if (index < data.groupList.length+2) {
+                    } else if (index < data.groupList.length + 2) {
                       // 그룹 목록
-                      Group group = data.groupList[index-2];
+                      Group group = data.groupList[index - 2];
                       return ListTile(
                         leading: CircleAvatar(
                           child: Text(group.groupName[0]),
@@ -147,8 +144,7 @@ class _HomePageState extends State<HomePage> {
                           // 클릭 시 해당 그룹 연락처 조회 페이지로 이동
                         },
                       );
-
-                    } else if (index == data.groupList.length+2) {
+                    } else if (index == data.groupList.length + 2) {
                       // divider
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -157,8 +153,7 @@ class _HomePageState extends State<HomePage> {
                           color: Color(0xFFEEEEEE),
                         ),
                       );
-
-                    } else if (index == data.groupList.length+3) {
+                    } else if (index == data.groupList.length + 3) {
                       // 연락처 라벨
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -172,7 +167,8 @@ class _HomePageState extends State<HomePage> {
                       );
                     } else {
                       // 연락처 목록
-                      Contact contact = data.contactList[index - data.groupList.length-4];
+                      Contact contact =
+                          data.contactList[index - data.groupList.length - 4];
                       return ListTile(
                         leading: CircleAvatar(
                           child: Text(contact.name[0]),
@@ -196,10 +192,8 @@ class _HomePageState extends State<HomePage> {
                       );
                     }
                   },
-
                 );
               },
-
             ),
           ),
         ],
@@ -232,30 +226,30 @@ class _HomePageState extends State<HomePage> {
         ],
         onTap: (value) {
           setState(() {
-            switch(value) {
+            switch (value) {
               case 0:
-              // Home 탭
+                // Home 탭
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => HomePage()),
                 );
                 break;
               case 1:
-              // 그룹 탭
+                // 그룹 탭
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => HomePage()),
                 );
                 break;
               case 2:
-              // 연락처 탭
+                // 연락처 탭
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ContactPage(data: data)),
+                  MaterialPageRoute(builder: (context) => ContactsScreen()),
                 );
                 break;
               case 3:
-              // 메시지 탭
+                // 메시지 탭
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => HomePage()),
@@ -265,7 +259,6 @@ class _HomePageState extends State<HomePage> {
           });
         },
       ),
-
     );
   }
 }
