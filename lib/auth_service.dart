@@ -2,8 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthService extends ChangeNotifier {
+  //로그인한 유저정보 가져오기
   User? currentUser() {
-    //현재유저
+    //로그인 되지 않으면 Null 반환
+    return FirebaseAuth.instance.currentUser;
   }
 
   /**

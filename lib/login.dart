@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_service.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final String name; // JoinUpPage에서 전달된 이름을 저장할 변수
+  const LoginPage({Key? key, required this.name}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -16,11 +18,14 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  get name => null;
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthService>(builder: (context, authService, child) {
       User? user = authService.currentUser();
       return Scaffold(
+        backgroundColor: Color(0xFF777777),
         appBar: AppBar(
           title: Text('로그인'),
         ),
@@ -30,21 +35,67 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
-                child: Text(
-                  user == null ? '로그인 해주세요' : '${user.email}님 안녕하세요',
-                  style: TextStyle(fontSize: 25),
+                child: Column(
+                  children: [
+                    Text(
+                      user == null ? '로그인 해주세요' : '${this.name}님 안녕하세요',
+                      style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 10), // 이메일과 비밀번호 안내문구와의 간격 조절
+                    Text(
+                      '이메일과 비밀번호를 입력해주세요',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20), // 간격 조절
+              Text(
+                '이메일',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
               ),
               TextField(
                 controller: emailController,
-                decoration: InputDecoration(hintText: '이메일'),
+                decoration: InputDecoration(
+                  hintText: '',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey), // 입력 라인 색상 설정
+                    borderRadius: BorderRadius.circular(10), // 입력 라인 모서리 라운드 설정
+                  ),
+                ),
+              ),
+              SizedBox(height: 10), // 간격 조절
+              Text(
+                '비밀번호',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
               TextField(
                 controller: passwordController,
                 //비밀번호 숨기기
                 obscureText: true,
-                decoration: InputDecoration(hintText: '비밀번호'),
+                decoration: InputDecoration(
+                  hintText: '',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey), // 입력 라인 색상 설정
+                    borderRadius: BorderRadius.circular(10), // 입력 라인 모서리 라운드 설정
+                  ),
+                ),
               ),
+              SizedBox(height: 100), // 간격 조절
               ElevatedButton(
                 onPressed: () {
                   //로그인
@@ -73,145 +124,33 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   );
                 },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    Color(0xFF27F39D), // 버튼 배경색
+                  ),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 버튼 모서리 라운드 설정
+                      side: BorderSide(
+                        color: Color(0xFF27F39D), // 버튼 테두리 색상
+                        width: 2, // 버튼 테두리 두께
+                      ),
+                    ),
+                  ),
+                ),
                 child: Text(
-                  "로그인",
+                  '로그인', // 버튼 텍스트
                   style: TextStyle(
-                    fontSize: 20,
+                    color: Colors.black, // 버튼 텍스트 색상
+                    fontWeight: FontWeight.bold, // 버튼 텍스트 굵기
+                    fontSize: 20, // 버튼 텍스트 크기
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  authService.signUp(
-                    email: emailController.text,
-                    password: passwordController.text,
-                    onSuccess: () {
-                      //회원가입 성공
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('회원가입 성공'),
-                        ),
-                      );
-                      // print('회원가입 성공');
-                    },
-                    onError: (err) {
-                      //에러발생
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(err),
-                        ),
-                      );
-                      // print('회원가입 실패 : $err');
-                    },
-                  );
-                },
-                child: Text(
-                  '회원가입',
-                  style: TextStyle(fontSize: 20),
-                ),
-              )
             ],
           ),
         ),
       );
     });
-  }
-}
-
-// 홈페이지
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  TextEditingController jobController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("ToDoList"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              //로그 버튼을 눌렀을 때 로그인 페이지로 이동
-              context.read<AuthService>().signOut();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => LoginPage()),
-              );
-            },
-            child: Text(
-              '로그아웃',
-              style: TextStyle(color: Colors.black),
-            ),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                // 입력창
-                Expanded(
-                  child: TextField(
-                    controller: jobController,
-                    decoration: InputDecoration(
-                      hintText: "job을 입력해주세요",
-                    ),
-                  ),
-                ),
-                // 추가버튼
-                ElevatedButton(
-                  onPressed: () {
-                    // job이 없다면
-                    if (jobController.text.isEmpty) {
-                      print('create job');
-                    }
-                  },
-                  child: Icon(Icons.add),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-          ),
-          // 투두 리스트
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, index) {
-                String job = "$index";
-                bool isDone = false;
-                return ListTile(
-                  title: Text(
-                    job,
-                    style: TextStyle(
-                        fontSize: 24,
-                        color: isDone ? Colors.grey : Colors.black,
-                        decoration: isDone
-                            ? TextDecoration.lineThrough
-                            : TextDecoration.none),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(CupertinoIcons.delete),
-                    onPressed: () {},
-                  ),
-                  onTap: () {
-                    // 아이템 클릭하여 isDone 상태 변경
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
