@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'view_profile.dart';
+import 'package:syncc_it/view_profile.dart';
 
 class MyProfile extends StatefulWidget {
   final SharedPreferences prefs;

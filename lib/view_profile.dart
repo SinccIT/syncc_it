@@ -1,6 +1,7 @@
-// view_profile.dart 파일
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:syncc_it/profile.dart'; // MyProfile 클래스를 임포트합니다.
+import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences 패키지를 임포트합니다.
 
 class ViewProfile extends StatelessWidget {
   final String name;
@@ -12,6 +13,7 @@ class ViewProfile extends StatelessWidget {
   final String profileImage;
 
   const ViewProfile({
+    Key? key,
     required this.name,
     required this.intro,
     required this.email,
@@ -19,7 +21,6 @@ class ViewProfile extends StatelessWidget {
     required this.phoneNumber,
     required this.contactTime,
     required this.profileImage,
-    Key? key,
   }) : super(key: key);
 
   @override
@@ -34,10 +35,10 @@ class ViewProfile extends StatelessWidget {
             Center(
               child: CircleAvatar(
                 radius: 80,
-                backgroundImage: profileImage.isNotEmpty &&
-                        File(profileImage).existsSync() // 수정: File 사용
-                    ? Image.file(File(profileImage)).image // 수정: Image.file 사용
-                    : AssetImage('images/profile.png'),
+                backgroundImage:
+                    profileImage.isNotEmpty && File(profileImage).existsSync()
+                        ? Image.file(File(profileImage)).image
+                        : AssetImage('images/profile.png'),
               ),
             ),
             SizedBox(height: 20),
@@ -74,6 +75,29 @@ class ViewProfile extends StatelessWidget {
             buildProfileInfo('Phone Number', phoneNumber),
             SizedBox(height: 50),
             buildProfileInfo('연락가능시간', contactTime),
+            SizedBox(height: 50),
+            ElevatedButton(
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences
+                    .getInstance(); // SharedPreferences 인스턴스를 가져옵니다.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyProfile(
+                      prefs: prefs, // 가져온 SharedPreferences 인스턴스를 전달합니다.
+                    ),
+                  ),
+                );
+              },
+              child: Text('프로필 수정'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // 홈 페이지로 돌아가는 버튼입니다.
+              },
+              child: Text('홈 페이지로 돌아가기'),
+            ),
           ],
         ),
       ),
