@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'data_model.dart';
 
@@ -43,17 +42,17 @@ class _PreviewSMSState extends State<PreviewSMS> {
 
       Uri uri = Uri.parse(uriString);
 
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri).then((success) {
-          if (success) {
-            print('SMS 전송 성공');
-          } else {
-            print('SMS 전송 실패');
-          }
-        });
-      } else {
-        throw '$uri를 실행할 수 없습니다.';
-      }
+      // if (await LaunchUrl(uri)) {
+      //   await launch(uri).then((success) {
+      //     if (success) {
+      //       print('SMS 전송 성공');
+      //     } else {
+      //       print('SMS 전송 실패');
+      //     }
+      //   });
+      // } else {
+      //   throw '$uri를 실행할 수 없습니다.';
+      // }
 
     }
 

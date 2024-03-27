@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:syncc_it/tab_bar_screen.dart';
 import 'package:syncc_it/tab_bar_screen1.dart';
 import 'data_model.dart';
+import 'message_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -35,8 +36,12 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        leading: Icon(
-          Icons.menu,
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            // 홈 화면으로 이동
+            Navigator.pushNamed(context, '/');
+          },
         ),
         actions: [
           IconButton(
@@ -206,7 +211,9 @@ class _HomePageState extends State<HomePage> {
               ? TabBarScreen()
               : _selectedIndex == 2
                   ? ContactsScreen()
-                  : SizedBox(),
+                    : _selectedIndex == 3
+                      ? SendSMS()
+                        : SizedBox(),
 
       // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(

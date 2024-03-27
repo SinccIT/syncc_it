@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:syncc_it/message_preview.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'data_model.dart';
 
@@ -288,34 +287,7 @@ class _SendSMSState extends State<SendSMS> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true
-      ,
-      appBar: AppBar(
-        backgroundColor: Color(0xFF27F39D),
-        title: Text(
-          'SynccIT',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            // 홈 화면으로 이동
-            Navigator.pushNamed(context, '/');
-          },
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(CupertinoIcons.search),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(CupertinoIcons.person),
-          ),
-        ],
-      ),
+      resizeToAvoidBottomInset: true,
 
       body: SingleChildScrollView(
         child: Column(
