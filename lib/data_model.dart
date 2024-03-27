@@ -5,15 +5,38 @@ import 'package:provider/provider.dart';
 class DataModel extends ChangeNotifier {
 
   List<Group> groupList = [
-    Group('One 에이전시', '파레트 프로젝트'),
-    Group('Office', '사무실 연락망'),
-    Group('LG생활건강', '파레트 프로젝트'),
+    Group(
+        'One 에이전시',
+        '파레트 프로젝트',
+        [
+          Contact('이한조', 'One 에이전시', 'Inactive'),
+        ]
+    ),
+    Group(
+        'Office',
+        '사무실 연락망',
+        [
+          Contact('박채연', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
+          Contact('김성종', 'CloudMarketing / ABC Cloud Corp.', 'Inactive'),
+          Contact('유윤경', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
+        ]
+    ),
+    Group(
+        'LG생활건강',
+        '파레트 프로젝트',
+        [
+          Contact('김한나', 'LG생활건강', 'Active'),
+        ]
+    ),
   ];
 
   List<Contact> contactList = [
     Contact('박채연', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
     Contact('김성종', 'CloudMarketing / ABC Cloud Corp.', 'Inactive'),
     Contact('유윤경', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
+    Contact('송가람', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
+    Contact('이재형', 'CloudMarketing / ABC Cloud Corp.', 'Inactive'),
+    Contact('백승용', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
     Contact('이한조', 'One 에이전시', 'Inactive'),
     Contact('김한나', 'LG생활건강', 'Active'),
     Contact('Jane Smith', 'Colleague', 'Inactive'),
@@ -62,6 +85,7 @@ class Contact {
 class Group {
   String groupName;
   String desc;
+  List<Contact> contacts;
 
-  Group(this.groupName, this.desc);
+  Group(this.groupName, this.desc, this.contacts);
 }
