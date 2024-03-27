@@ -178,14 +178,14 @@ class _MyProfileState extends State<MyProfile> {
 
   Widget _buildBottomSheet(BuildContext context) {
     return Container(
-      height: 200,
+      height: 250,
       width: MediaQuery.of(context).size.width,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Text(
-            'Choose Profile photo',
+            '프로필 사진 변경',
             style: TextStyle(
               fontSize: 20,
             ),
@@ -199,27 +199,44 @@ class _MyProfileState extends State<MyProfile> {
                   icon: Icon(Icons.camera, size: 50),
                   onPressed: takePhoto,
                   label: Text(
-                    'Camera',
+                    '카메라',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
               ),
               SizedBox(width: 20),
               Expanded(
-                child: SizedBox(
-                  height: 60, // 아이콘의 위치 조정
-                  child: TextButton.icon(
-                    icon: Icon(Icons.photo_library, size: 50),
-                    onPressed: chooseImage,
-                    label: Text(
-                      'Gallery',
-                      style: TextStyle(fontSize: 20),
-                    ),
+                child: TextButton.icon(
+                  icon: Icon(Icons.photo_library, size: 50),
+                  onPressed: chooseImage,
+                  label: Text(
+                    '갤러리',
+                    style: TextStyle(fontSize: 20),
                   ),
                 ),
               ),
             ],
-          )
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _imageFile = null;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    '기본 이미지 선택',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -332,7 +349,7 @@ class _MyProfileState extends State<MyProfile> {
           title: Text('이름 입력'),
           content: TextField(
             controller: _nameController,
-            decoration: InputDecoration(hintText: "Enter your name"),
+            decoration: InputDecoration(hintText: "이름을 입력 하세요"),
           ),
           actions: <Widget>[
             TextButton(
@@ -376,23 +393,16 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  void _saveChanges() async {
-    // 수정된 정보를 SharedPreferences에 저장합니다.
-    await widget.prefs.setString('name', _nameController.text);
-    await widget.prefs.setString('intro', _introController.text);
-    await widget.prefs.setString('email', _emailController.text);
-    await widget.prefs.setString('id', _idController.text);
-    await widget.prefs.setString('phoneNumber', _phoneNumberController.text);
-    await widget.prefs.setString('selectedContactTime', _selected);
-    // 이미지 파일 경로를 저장합니다.
-    if (_imageFile != null) {
-      await widget.prefs.setString('profileImage', _imageFile!.path);
-    }
-  }
-
-  // 수정된 정보를 저장하고 ViewProfile 페이지로 이동하는 함수
   void _saveAndNavigateToViewProfile(BuildContext context) {
-    _saveChanges(); // 수정된 정보를 저장하는 함수 호출
+    widget.prefs.setString('name', _nameController.text);
+    widget.prefs.setString('intro', _introController.text);
+    widget.prefs.setString('email', _emailController.text);
+    widget.prefs.setString('id', _idController.text);
+    widget.prefs.setString('phoneNumber', _phoneNumberController.text);
+    widget.prefs.setString('selectedContactTime', _selected);
+    if (_imageFile != null) {
+      widget.prefs.setString('profileImage', _imageFile!.path);
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
