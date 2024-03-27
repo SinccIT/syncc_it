@@ -44,8 +44,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
     await prefs.setStringList('groupItems', _groupItems);
     await prefs.setStringList('groupItemDescriptions', _groupItemDescriptions);
     await prefs.setStringList('groupItemTags', _groupItemTags);
-    await prefs.setStringList(
-        'selectedContacts', _selectedContacts); // 선택된 멤버 목록을 저장합니다.
+    await prefs.setStringList('selectedContacts_${_groupItems.length - 1}',
+        _selectedContacts); // 탭마다 별도의 저장 키 사용
   }
 
   void _removeItem(int index) async {
@@ -91,7 +91,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
                       groupDescription: _groupItemDescriptions[index],
                       groupTags: _groupItemTags[index],
                       selectedMembers:
-                          _selectedContacts, // Pass the actual list of selected members
+                          prefs.getStringList('selectedContacts_$index') ??
+                              [], // 해당 탭에 대한 선택된 멤버 불러오기
                     ),
                   ),
                 );
@@ -105,7 +106,7 @@ class _TabBarScreenState extends State<TabBarScreen> {
                     builder: (context) {
                       return AlertDialog(
                         title: Text("삭제"),
-                        content: Text("이 항목을 삭제하시겠습니까?"),
+                        content: Text("이 그룹을 삭제하시겠습니까?"),
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
@@ -360,22 +361,81 @@ class GroupDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 상세조회 페이지의 UI를 구성하는 코드를 작성합니다.
-    // 예를 들어, Scaffold를 사용하여 페이지를 구성하고,
-    // groupName, groupDescription, groupTags, selectedMembers 등을 표시합니다.
     return Scaffold(
       appBar: AppBar(
-        title: Text('Group Detail'),
+        title: Text('그룹 정보'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Group Name: $groupName'),
-            Text('Description: $groupDescription'),
-            Text('Tags: $groupTags'),
-            Text('Selected Members: ${selectedMembers.join(', ')}'),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64.0, horizontal: 32.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: CircleAvatar(
+                  radius: 100,
+                  backgroundImage: NetworkImage(
+                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D'),
+                ),
+              ),
+              SizedBox(height: 64.0),
+              Text(
+                'Group Name',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8.0), // Additional space
+              Text(
+                groupName,
+                style: TextStyle(fontSize: 18.0), // Increased font size
+              ),
+              SizedBox(height: 24.0),
+              Text(
+                'Group Description',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8.0), // Additional space
+              Text(
+                groupDescription,
+                style: TextStyle(fontSize: 16.0),
+              ),
+              SizedBox(height: 24.0),
+              Text(
+                'Tags',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8.0), // Additional space
+              Text(
+                groupTags,
+                style: TextStyle(fontSize: 16.0),
+              ),
+              SizedBox(height: 24.0),
+              Text(
+                'Selected Members',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Wrap(
+                spacing: 8.0,
+                children: selectedMembers.map((member) {
+                  return Chip(
+                    label: Text(member),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 64.0),
+            ],
+          ),
         ),
       ),
     );
