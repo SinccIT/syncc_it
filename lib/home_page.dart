@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: Icon(Icons.add_home_outlined),
           onPressed: () {
             // 홈 화면으로 이동
             Navigator.pushNamed(context, '/');
