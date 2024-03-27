@@ -4,11 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:syncc_it/tab_bar_screen.dart';
 import 'package:syncc_it/tab_bar_screen1.dart';
 import 'data_model.dart';
-import 'view_profile.dart'; // ViewProfile 클래스를 임포트합니다.
 
 class HomePage extends StatefulWidget {
-  final String name; // 사용자 이름을 저장할 변수
-  const HomePage({Key? key, required this.name}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -23,25 +21,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _onProfileIconPressed(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ViewProfile(
-          name: widget.name,
-          intro: '상태 메시지',
-          email: 'example@example.com',
-          id: 'user_id',
-          phoneNumber: '010-1234-5678',
-          contactTime: '오전 10시 - 오후 6시',
-          profileImage: '',
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    // DataModel에 접근
     final data = DataProvider.of(context);
 
     return Scaffold(
@@ -53,29 +35,33 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        leading: Icon(
+          Icons.menu,
+        ),
         actions: [
           IconButton(
-            onPressed: () {
-              // 검색 기능을 수행할 작업 추가
-            },
+            onPressed: () {},
             icon: Icon(CupertinoIcons.search),
           ),
           IconButton(
-            onPressed: () => _onProfileIconPressed(context),
+            onPressed: () {},
             icon: Icon(CupertinoIcons.person),
           ),
         ],
       ),
+
       body: _selectedIndex == 0
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: 8),
+                // 프로필 영역
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      // 프로필 이미지
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: CircleAvatar(
@@ -84,6 +70,7 @@ class _HomePageState extends State<HomePage> {
                               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D'),
                         ),
                       ),
+                      // 닉네임
                       Text(
                         '사용자 닉네임',
                         style: TextStyle(
@@ -101,6 +88,8 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
+
+                // 그룹 및 연락처 목록
                 Expanded(
                   child: Consumer<DataModel>(
                     builder: (context, data, child) {
@@ -109,6 +98,7 @@ class _HomePageState extends State<HomePage> {
                             data.groupList.length + data.contactList.length + 4,
                         itemBuilder: (context, index) {
                           if (index == 0) {
+                            // divider
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
@@ -118,6 +108,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           } else if (index == 1) {
+                            // 그룹 라벨
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
@@ -130,6 +121,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           } else if (index < data.groupList.length + 2) {
+                            // 그룹 목록
                             Group group = data.groupList[index - 2];
                             return ListTile(
                               leading: CircleAvatar(
@@ -150,9 +142,12 @@ class _HomePageState extends State<HomePage> {
                                   color: Color(0xFFC8C8C8),
                                 ),
                               ),
-                              onTap: () {},
+                              onTap: () {
+                                // 클릭 시 해당 그룹 연락처 조회 페이지로 이동
+                              },
                             );
                           } else if (index == data.groupList.length + 2) {
+                            // divider
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
@@ -162,6 +157,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           } else if (index == data.groupList.length + 3) {
+                            // 연락처 라벨
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
@@ -174,6 +170,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           } else {
+                            // 연락처 목록
                             Contact contact = data
                                 .contactList[index - data.groupList.length - 4];
                             return ListTile(
@@ -210,11 +207,14 @@ class _HomePageState extends State<HomePage> {
               : _selectedIndex == 2
                   ? ContactsScreen()
                   : SizedBox(),
+
+      // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
-        selectedItemColor: Color(0xFF27F39D),
-        unselectedItemColor: Color(0xFFC8C8C8),
+        selectedItemColor: Color(0xFF27F39D), // 선택된 항목의 색상
+        unselectedItemColor: Color(0xFFC8C8C8), // 선택되지 않은 항목의 색상
         showUnselectedLabels: true,
+
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
