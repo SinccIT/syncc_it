@@ -103,9 +103,10 @@ class AuthService extends ChangeNotifier {
       //로그인 상태변경 알림
       notifyListeners();
     } on FirebaseAuthException catch (e) {
-      // FireBase Auth 에러가 발생 했을 때
-      onError(e.message!);
+      // FirebaseAuthException에서 오류 메시지를 가져와 onError 콜백 함수를 호출합니다.
+      onError(e.message ?? '로그인 오류가 발생했습니다.');
     } catch (e) {
+      // 그 외의 예외가 발생했을 때의 처리입니다.
       onError(e.toString());
     }
   }

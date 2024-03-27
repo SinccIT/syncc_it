@@ -9,12 +9,20 @@ class JoinPage extends StatelessWidget {
   final AuthService authService;
   JoinPage({required this.authService}); // authService를 초기화하는 생성자
 
-  List<bool> isCheckedList = [
-    false,
-    false,
-    false,
-    false
-  ]; // 각 체크박스의 상태를 저장하는 리스트
+  // 모든 체크박스의 선택 상태를 저장하는 리스트
+  List<bool> isCheckedList = [false, false, false, false];
+
+  // 필수 동의 항목을 모두 선택했는지 확인하는 함수
+  bool areAllChecked() {
+    return isCheckedList.every((isChecked) => isChecked);
+  }
+
+  // 모든 체크박스의 선택 상태를 변경하는 함수
+  void toggleAllChecked(bool newValue) {
+    for (int i = 0; i < isCheckedList.length; i++) {
+      isCheckedList[i] = newValue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +83,6 @@ class JoinPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 20), // 버튼 간격 조절
-
                 SizedBox(
                   width: 150, // 버튼 너비
                   height: 50, // 버튼 높이
@@ -88,7 +95,8 @@ class JoinPage extends StatelessWidget {
                           return StatefulBuilder(
                             builder:
                                 (BuildContext context, StateSetter setState) {
-                              bool isChecked = false; // 체크 박스 상태를 저장할 변수
+                              bool isAllChecked =
+                                  areAllChecked(); // 모든 체크박스 선택 상태 확인
 
                               return Container(
                                 height: 300, // 모달 높이 크기
@@ -110,7 +118,8 @@ class JoinPage extends StatelessWidget {
                                           value: isCheckedList[0],
                                           onChanged: (value) {
                                             setState(() {
-                                              isCheckedList[0] = value!;
+                                              // 모두 동의합니다 체크박스 상태 변경
+                                              toggleAllChecked(!isAllChecked);
                                             });
                                           },
                                         ),
