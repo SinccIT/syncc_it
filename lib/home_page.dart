@@ -217,7 +217,8 @@ class _HomePageState extends State<HomePage> {
 
       // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Color(0xFF313034),
         selectedItemColor: Color(0xFF27F39D), // 선택된 항목의 색상
         unselectedItemColor: Color(0xFFC8C8C8), // 선택되지 않은 항목의 색상
         showUnselectedLabels: true,
