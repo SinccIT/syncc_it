@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:syncc_it/profile.dart'; // MyProfile 클래스를 임포트합니다.
 import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences 패키지를 임포트합니다.
+import 'package:syncc_it/home_page.dart';
 
 class ViewProfile extends StatelessWidget {
   final String name;
@@ -94,7 +95,13 @@ class ViewProfile extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // 홈 페이지로 돌아가는 버튼입니다.
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(), // MyHomePage 위젯을 사용합니다.
+                  ),
+                  (route) => false, // 모든 이전 라우트를 제거하기 위해 false를 반환합니다.
+                );
               },
               child: Text('홈 페이지로 돌아가기'),
             ),

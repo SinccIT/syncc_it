@@ -119,29 +119,12 @@ class _MyProfileState extends State<MyProfile> {
             buildContactTimeDropdown(),
             SizedBox(height: 50),
             ElevatedButton(
-              onPressed: () {
-                _saveAndNavigateToViewProfile(context);
-              },
+              onPressed: _saveAndNavigateToViewProfile,
               child: Text('저장'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ViewProfile(
-                      name: _nameController.text,
-                      intro: _introController.text,
-                      email: _emailController.text,
-                      id: _idController.text,
-                      phoneNumber: _phoneNumberController.text,
-                      contactTime: _selected,
-                      profileImage: _imageFile?.path ?? '',
-                    ),
-                  ),
-                );
-              },
+              onPressed: _navigateToViewProfile,
               child: Text('프로필 보기'),
             )
           ],
@@ -163,7 +146,9 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  Future<void> _saveImageToGallery(String imagePath) async {}
+  Future<void> _saveImageToGallery(String imagePath) async {
+    // 이미지를 갤러리에 저장하는 로직을 구현하세요.
+  }
 
   void chooseImage() async {
     final XFile? pickedFile =
@@ -393,7 +378,7 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  void _saveAndNavigateToViewProfile(BuildContext context) {
+  void _saveAndNavigateToViewProfile() async {
     widget.prefs.setString('name', _nameController.text);
     widget.prefs.setString('intro', _introController.text);
     widget.prefs.setString('email', _emailController.text);
@@ -401,8 +386,31 @@ class _MyProfileState extends State<MyProfile> {
     widget.prefs.setString('phoneNumber', _phoneNumberController.text);
     widget.prefs.setString('selectedContactTime', _selected);
     if (_imageFile != null) {
-      widget.prefs.setString('profileImage', _imageFile!.path);
+      // 이미지 파일이 있는 경우에만 저장합니다.
+      await widget.prefs.setString('profileImage', _imageFile!.path);
+    } else {
+      // 이미지 파일이 없는 경우 기본 이미지를 저장합니다.
+      widget.prefs.remove('profileImage');
     }
+
+    // 수정된 정보를 저장하고 프로필 보기 페이지로 이동합니다.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewProfile(
+          name: _nameController.text,
+          intro: _introController.text,
+          email: _emailController.text,
+          id: _idController.text,
+          phoneNumber: _phoneNumberController.text,
+          contactTime: _selected,
+          profileImage: _imageFile?.path ?? '',
+        ),
+      ),
+    );
+  }
+
+  void _navigateToViewProfile() {
     Navigator.push(
       context,
       MaterialPageRoute(

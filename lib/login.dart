@@ -62,11 +62,11 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-                // 이메일 입력란
+// 이메일 입력란
                 TextFieldContainer(
                   controller: emailController, // 수정된 부분: controller 전달
                   onChanged: (value) {
-                    // 입력값이 변경될 때 처리할 로직 추가
+// 입력값이 변경될 때 처리할 로직 추가
                   },
                 ),
                 SizedBox(height: 10), // 간격 조절
@@ -82,17 +82,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-                // 비밀번호 입력란
+// 비밀번호 입력란
                 TextFieldContainer(
                   controller: passwordController, // 수정된 부분: controller 전달
                   onChanged: (value) {
-                    // 입력값이 변경될 때 처리할 로직 추가
+// 입력값이 변경될 때 처리할 로직 추가
                   },
                 ),
                 SizedBox(height: 100), // 간격 조절
                 ElevatedButton(
                   onPressed: () {
-                    //로그인
+//로그인
                     authService.signIn(
                       email: emailController.text,
                       password: passwordController.text,
@@ -102,8 +102,8 @@ class _LoginPageState extends State<LoginPage> {
                             content: Text('로그인 성공'),
                           ),
                         );
-                        //로그인 성공시 홈페이지로 이동
-                        // pushReplacement 새로운 페이지로 이동해서 뒤로버튼 X
+//로그인 성공시 홈페이지로 이동
+// pushReplacement 새로운 페이지로 이동해서 뒤로버튼 X
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => HomePage()),
@@ -131,6 +131,9 @@ class _LoginPageState extends State<LoginPage> {
                           width: 2, // 버튼 테두리 두께
                         ),
                       ),
+                    ),
+                    fixedSize: MaterialStateProperty.all<Size>(
+                      Size(300, 50), // 버튼 고정 크기 설정
                     ),
                   ),
                   child: Text(
