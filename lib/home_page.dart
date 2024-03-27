@@ -54,9 +54,7 @@ class _HomePageState extends State<HomePage> {
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 8,
-                ),
+                SizedBox(height: 8),
                 // 프로필 영역
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -208,15 +206,13 @@ class _HomePageState extends State<HomePage> {
               ? TabBarScreen()
               : _selectedIndex == 2
                   ? ContactsScreen()
-                  : Center(child: Text('Unknown index: $_selectedIndex')),
+                  : SizedBox(),
 
       // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF313034),
+        backgroundColor: Colors.black,
         selectedItemColor: Color(0xFF27F39D), // 선택된 항목의 색상
-        unselectedItemColor: Color(0xFFC8C8C8),
-        type: BottomNavigationBarType.fixed,
-        // 선택되지 않은 항목의 색상
+        unselectedItemColor: Color(0xFFC8C8C8), // 선택되지 않은 항목의 색상
         showUnselectedLabels: true,
 
         items: const <BottomNavigationBarItem>[
