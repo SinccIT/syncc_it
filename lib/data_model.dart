@@ -9,37 +9,37 @@ class DataModel extends ChangeNotifier {
         'One 에이전시',
         '파레트 프로젝트',
         [
-          Contact('이한조', 'One 에이전시', 'Inactive'),
+          Contact('이한조', 'One 에이전시', '01091790542', 'Inactive'),
         ]
     ),
     Group(
         'Office',
         '사무실 연락망',
         [
-          Contact('박채연', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
-          Contact('김성종', 'CloudMarketing / ABC Cloud Corp.', 'Inactive'),
-          Contact('유윤경', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
+          Contact('박채연', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Active'),
+          Contact('김성종', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Inactive'),
+          Contact('유윤경', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Active'),
         ]
     ),
     Group(
         'LG생활건강',
         '파레트 프로젝트',
         [
-          Contact('김한나', 'LG생활건강', 'Active'),
+          Contact('김한나', 'LG생활건강', '01091790542', 'Active'),
         ]
     ),
   ];
 
   List<Contact> contactList = [
-    Contact('박채연', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
-    Contact('김성종', 'CloudMarketing / ABC Cloud Corp.', 'Inactive'),
-    Contact('유윤경', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
-    Contact('송가람', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
-    Contact('이재형', 'CloudMarketing / ABC Cloud Corp.', 'Inactive'),
-    Contact('백승용', 'CloudMarketing / ABC Cloud Corp.', 'Active'),
-    Contact('이한조', 'One 에이전시', 'Inactive'),
-    Contact('김한나', 'LG생활건강', 'Active'),
-    Contact('Jane Smith', 'Colleague', 'Inactive'),
+    Contact('박채연', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Active'),
+    Contact('김성종', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Inactive'),
+    Contact('유윤경', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Active'),
+    Contact('송가람', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Active'),
+    Contact('이재형', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Inactive'),
+    Contact('백승용', 'CloudMarketing / ABC Cloud Corp.', '01091790542', 'Active'),
+    Contact('이한조', 'One 에이전시', '01091790542', 'Inactive'),
+    Contact('김한나', 'LG생활건강', '01091790542', 'Active'),
+    Contact('Jane Smith', 'Colleague', '01091790542', 'Inactive'),
   ];
 
   void updateGroupList(List<Group> groupList) {
@@ -77,9 +77,10 @@ class DataProvider extends StatelessWidget {
 class Contact {
   String name;
   String desc;
+  String phoneNumber;
   String status;
 
-  Contact(this.name, this.desc, this.status);
+  Contact(this.name, this.desc, this.phoneNumber, this.status);
 }
 
 class Group {

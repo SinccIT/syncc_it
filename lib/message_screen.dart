@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:syncc_it/message_preview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'data_model.dart';
@@ -25,6 +26,8 @@ class SendSMS extends StatefulWidget {
 class _SendSMSState extends State<SendSMS> {
 
   List<String> recipients = [];
+  int totalRecipientsCount = 0;
+
   String message = "";
   String selectedTime = "즉시";   // 전송시간 default값
   late TextEditingController msgEditingController;
@@ -99,7 +102,7 @@ class _SendSMSState extends State<SendSMS> {
                 ),
               ),
 
-              // 그룹과 연락처 목록을 한 ListView에 표시
+              // 그룹과 연락처 목록을 하나의 ListView에 표시
               Expanded(
                 child: ListView.builder(
                   itemCount: combinedList.length + 2,
@@ -117,7 +120,7 @@ class _SendSMSState extends State<SendSMS> {
                       );
                     }
                     // ****그룹 목록
-                    else if (index < dataModel.groupList.length+1) {
+                    else if (index < dataModel.groupList.length + 1) {
 
                       bool isSelected = recipients.contains(combinedList[index-1]);
 
@@ -125,7 +128,7 @@ class _SendSMSState extends State<SendSMS> {
                         title: Text(
                           combinedList[index-1],
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 19,
                           ),
                         ),
                         onTap: () {
@@ -139,14 +142,30 @@ class _SendSMSState extends State<SendSMS> {
                               }
                             }
                           });
-                          isSelected = !isSelected;
                           print(selectedRecipients);
                         },
-                        // 선택된 항목인 경우 색상 변경
-                        trailing: Icon(
-                          Icons.check,
-                          color: isSelected ? Color(0xFF27F39D) : Color(0xFFC8C8C8),
+                        // 선택된 항목인 경우 동적으로 색상 변경
+                        trailing: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if(isSelected) {
+                                selectedRecipients.remove(combinedList[index-1]);
+                                recipients.remove(combinedList[index-1]);
+                              } else {
+                                if(!selectedRecipients.contains(combinedList[index-1])) {
+                                  selectedRecipients.add(combinedList[index-1]);
+                                }
+                              }
+                              isSelected = !isSelected;
+                            });
+                            print(selectedRecipients);
+                          },
+                          child: Icon(
+                            Icons.check_box_rounded,
+                            color: isSelected ? Color(0xFF27F39D) : Color(0xFFC8C8C8),
+                          ),
                         ),
+
                       );
                     }
                     // 연락처 라벨
@@ -163,21 +182,57 @@ class _SendSMSState extends State<SendSMS> {
                     }
                     // 연락처 목록
                     else {
+                      bool isSelected = recipients.contains(combinedList[index-2]);
+
                       return ListTile(
                         title: Text(
                           combinedList[index-2],
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 19,
                           ),
                         ),
                         onTap: () {
                           // 선택된 항목 처리
+                          setState(() {
+                            if(isSelected) {
+                              selectedRecipients.remove(combinedList[index-2]);
+                              recipients.remove(combinedList[index-2]);
+                            } else {
+                              if(!recipients.contains(combinedList[index-2])) {
+                                selectedRecipients.add(combinedList[index-2]);
+                              }
+                            }
+                          });
+                          print(selectedRecipients);
                         },
+                        // 선택된 항목인 경우 동적으로 색상 변경
+                        trailing: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if(isSelected) {
+                                selectedRecipients.remove(combinedList[index-2]);
+                                recipients.remove(combinedList[index-2]);
+                              } else {
+                                if(!recipients.contains(combinedList[index-2])) {
+                                  selectedRecipients.add(combinedList[index-2]);
+                                }
+                              }
+                            });
+                            print(selectedRecipients);
+                          },
+                          child: Icon(
+                            Icons.check_box_rounded,
+                            color: isSelected ? Color(0xFF27F39D) : Color(0xFFC8C8C8),
+                          ),
+                        ),
+
                       );
                     }
+
                   },
                 ),
               ),
+
               // 추가하기 버튼
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -186,10 +241,30 @@ class _SendSMSState extends State<SendSMS> {
                     // 추가하기 버튼 눌렀을 때 동작
                     setState(() {
                       recipients.addAll(selectedRecipients);
+                      selectedRecipients.clear(); // 추가 후 선택된 항목 초기화
                     });
                     Navigator.of(context).pop();
                   },
-                  child: Text("확인"),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                    ),
+                  ),
+                  child: SizedBox(
+                      width: double.infinity,
+                      child: Center(
+                          child: Text(
+                              "확인",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF000000),
+                            ),
+                          ),
+                      ),
+                  ),
                 ),
               ),
             ],
@@ -197,8 +272,6 @@ class _SendSMSState extends State<SendSMS> {
         );
       },
     );
-
-
 
 
   }
@@ -211,15 +284,6 @@ class _SendSMSState extends State<SendSMS> {
     });
   }
 
-  // 메시지 전송 함수
-  void sendSMS() async {
-    String uri = 'sms:${recipients.join(",")}?body=안녕하세요. 테스트 메시지 입니다.';
-    if(await canLaunchUrl(uri as Uri)) {
-      await launchUrl(uri as Uri);
-    } else {
-      throw 'Could not launch ${uri}';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,8 +298,12 @@ class _SendSMSState extends State<SendSMS> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        leading: Icon(
-          Icons.menu,
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            // 홈 화면으로 이동
+            Navigator.pushNamed(context, '/');
+          },
         ),
         actions: [
           IconButton(
@@ -270,7 +338,7 @@ class _SendSMSState extends State<SendSMS> {
               itemCount: recipients.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  contentPadding: EdgeInsets.symmetric(vertical: 0),
+                  contentPadding: EdgeInsets.symmetric(vertical: -2),
                   title: Row(
                     children: [
                       IconButton(
@@ -280,7 +348,12 @@ class _SendSMSState extends State<SendSMS> {
                           color: Color(0xFFC8C8C8),
                         ),
                       ),
-                      Text(recipients[index]),
+                      Text(
+                        recipients[index],
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -300,12 +373,13 @@ class _SendSMSState extends State<SendSMS> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF000000),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(32),
                       ),
                     ),
                     child: Text(
-                        "그룹/연락처 추가",
+                        "수신인 추가",
                       style: TextStyle(
+                        fontSize: 14,
                         color: Color(0xFFFFFFFF),
                       ),
                     ),
@@ -364,44 +438,44 @@ class _SendSMSState extends State<SendSMS> {
               ),
             ),
         
-            SizedBox(height: 20),
+            SizedBox(height: 28),
         
             // 전송시간
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
-              child: Row(
-                children: [
-                  Text(
-                    "전송 시간",
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  SizedBox(width: 14),
-                  Radio<String>(
-                    value: "즉시",
-                    groupValue: selectedTime,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedTime = value!;
-                      });
-                    },
-                  ),
-                  Text("즉시"),
-                  SizedBox(width: 14),
-                  Radio<String>(
-                    value: "예약",
-                    groupValue: selectedTime,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedTime = value!;
-                      });
-                    },
-                  ),
-                  Text("예약"),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 14.0),
+            //   child: Row(
+            //     children: [
+            //       Text(
+            //         "전송 시간",
+            //         style: TextStyle(
+            //           fontSize: 16,
+            //         ),
+            //       ),
+            //       SizedBox(width: 14),
+            //       Radio<String>(
+            //         value: "즉시",
+            //         groupValue: selectedTime,
+            //         onChanged: (value) {
+            //           setState(() {
+            //             selectedTime = value!;
+            //           });
+            //         },
+            //       ),
+            //       Text("즉시"),
+            //       SizedBox(width: 14),
+            //       Radio<String>(
+            //         value: "예약",
+            //         groupValue: selectedTime,
+            //         onChanged: (value) {
+            //           setState(() {
+            //             selectedTime = value!;
+            //           });
+            //         },
+            //       ),
+            //       Text("예약"),
+            //     ],
+            //   ),
+            // ),
         
             // 전송 메시지 입력
             Padding(
@@ -410,7 +484,13 @@ class _SendSMSState extends State<SendSMS> {
                 controller: msgEditingController,
                 decoration: InputDecoration(
                   hintText: "메시지를 입력하세요.",
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFEEEEEE)),
+                  ),
+                  focusColor: Color(0xFF27F39D),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF27F39D)),
+                  ),
                 ),
                 maxLines: 6,
                 onChanged: (value) {
@@ -424,14 +504,25 @@ class _SendSMSState extends State<SendSMS> {
             SizedBox(height: 20),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Row(
                 children: [
                   Expanded(
                     child: ElevatedButton(
                       onPressed:() {
                         // 입력 메시지 확인
-                        print('${message}');
+                        String message = msgEditingController.text;
+
+                        // 다음화면으로 이동 및 메시지 전달
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PreviewSMS(
+                                message: message,
+                                recipients: recipients
+                            ),
+                          ),
+                        );
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
@@ -442,7 +533,7 @@ class _SendSMSState extends State<SendSMS> {
                         ),
                       ),
                       child: Text(
-                        '미리보기',
+                        '전송할 메시지 미리보기',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF000000),

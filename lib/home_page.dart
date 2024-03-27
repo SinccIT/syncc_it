@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:syncc_it/message_screen.dart';
 import 'package:syncc_it/tab_bar_screen1.dart';
 import 'data_model.dart';
 
@@ -252,7 +253,7 @@ class _HomePageState extends State<HomePage> {
                 // 메시지 탭
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
+                  MaterialPageRoute(builder: (context) => SendSMS()),
                 );
                 break;
             }
