@@ -421,21 +421,24 @@ class GroupDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('그룹 정보'),
         actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditGroupScreen(
-                    groupName: groupName,
-                    groupDescription: groupDescription,
-                    groupTags: groupTags,
-                    selectedMembers: selectedMembers,
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditGroupScreen(
+                      groupName: groupName,
+                      groupDescription: groupDescription,
+                      groupTags: groupTags,
+                      selectedMembers: selectedMembers,
+                    ),
                   ),
-                ),
-              );
-            },
-            child: Text('Edit'),
+                );
+              },
+              child: Text('수정'),
+            ),
           ),
         ],
       ),
@@ -591,9 +594,46 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                 ),
               ),
               SizedBox(height: 12.0),
+              // 선택된 멤버 표시
+              Wrap(
+                children: _selectedMembers.map((member) {
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Chip(
+                      label: Text(member),
+                      onDeleted: () {
+                        setState(() {
+                          _selectedMembers.remove(member);
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 12.0),
+              ElevatedButton(
+                onPressed: () async {
+                  // 멤버 추가 화면으로 이동하여 선택된 멤버 업데이트
+                  List<String>? newMembers = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddContactScreen(
+                        onAdd: _addGroup1,
+                      ),
+                    ),
+                  );
+                  if (newMembers != null) {
+                    setState(() {
+                      _selectedMembers = newMembers;
+                    });
+                  }
+                },
+                child: Text('멤버 추가'),
+              ),
+              SizedBox(height: 12.0),
               ElevatedButton(
                 onPressed: () {
-                  // 수정된 정보 저장 및 이전 페이지로 이동
+                  // 수정된 정보 저장
                   _saveChanges();
                 },
                 child: Text('저장'),
@@ -620,6 +660,14 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
       'description': newDescription,
       'tags': newTags,
       'members': newMembers
+    });
+  }
+
+  // 선택된 멤버 추가 함수 정의
+  void _addGroup1(String name, String description, String tags,
+      List<String> selectedContacts) {
+    setState(() {
+      _selectedMembers = List.from(selectedContacts);
     });
   }
 }

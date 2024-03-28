@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncc_it/data_model.dart';
 import 'package:syncc_it/tab_bar_screen.dart';
+import 'package:syncc_it/tab_bar_screen1.dart';
 import 'package:syncc_it/view_profile.dart';
 import 'package:syncc_it/profile.dart'; // MyProfile 클래스의 경로에 맞게 수정해야 합니다.
 import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences 추가
@@ -210,7 +211,9 @@ class _HomePageState extends State<HomePage> {
             )
           : _selectedIndex == 1
               ? TabBarScreen()
-              : SizedBox(), // ContactsScreen 대신에 SizedBox 사용
+              : _selectedIndex == 2
+                  ? ContactsScreen()
+                  : SizedBox(), // ContactsScreen 대신에 SizedBox 사용
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
         selectedItemColor: Color(0xFF27F39D),

@@ -272,7 +272,7 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
                         widget.onAdd(name, description, tags);
                         Navigator.pop(context);
                       },
-                      child: Text('Save'),
+                      child: Text('저장'),
                     ),
                   ],
                 ),
@@ -320,7 +320,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 64.0, horizontal: 32.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
                 child: CircleAvatar(
@@ -361,7 +361,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 _updatedContactPhoneNumber,
                 style: TextStyle(fontSize: 16.0),
               ),
-              SizedBox(height: 64.0),
+              SizedBox(height: 32.0),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
@@ -384,7 +384,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                     ),
                   );
                 },
-                child: Text('Edit'),
+                child: Text('수정'),
               ),
             ],
           ),
@@ -438,12 +438,12 @@ class _EditContactScreenState extends State<EditContactScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Contact'),
+        title: Text('연락처 수정'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(32.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: _nameController,
@@ -460,9 +460,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
               ),
               onChanged: widget.onPhoneNumberChanged, // 전화번호가 변경될 때 콜백 함수 호출
             ),
+            SizedBox(height: 12.0), // 버튼 위에 간격 추가
             ElevatedButton(
               onPressed: (_saveChanges),
-              child: Text('Save Changes'),
+              child: Text('저장'),
             ),
           ],
         ),
