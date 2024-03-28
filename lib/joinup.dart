@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncc_it/home_page.dart';
+import 'package:syncc_it/login.dart';
 
 import 'auth_service.dart';
 
@@ -17,7 +18,7 @@ class JoinUpPage extends StatelessWidget {
   final TextEditingController ageController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
 
-  // 이름, 소속, 직무, 연령, 성별을 저장할 변수 선언
+// 이름, 소속, 직무, 연령, 성별을 저장할 변수 선언
   String name = '';
   String affiliation = '';
   String position = '';
@@ -69,8 +70,8 @@ class JoinUpPage extends StatelessWidget {
                         child: TextField(
                           controller: nameController,
                           onChanged: (value) {
-                            // 이름이 변경될 때 실행되는 콜백
-                            // 변경된 이름을 저장하는 작업 가능
+// 이름이 변경될 때 실행되는 콜백
+// 변경된 이름을 저장하는 작업 가능
                             name = value;
                           },
                         ),
@@ -91,7 +92,7 @@ class JoinUpPage extends StatelessWidget {
                               controller:
                                   emailController, // 수정된 부분: controller 전달
                               onChanged: (value) {
-                                // 입력값이 변경될 때 처리할 로직 추가
+// 입력값이 변경될 때 처리할 로직 추가
                               },
                               child: TextField(),
                             ),
@@ -112,7 +113,7 @@ class JoinUpPage extends StatelessWidget {
                               controller:
                                   passwordController, // 수정된 부분: controller 전달
                               onChanged: (value) {
-                                // 입력값이 변경될 때 처리할 로직 추가
+// 입력값이 변경될 때 처리할 로직 추가
                               },
                               child: TextField(),
                             ),
@@ -134,8 +135,8 @@ class JoinUpPage extends StatelessWidget {
                             child: TextField(
                               controller: affiliationController,
                               onChanged: (value) {
-                                // 이름이 변경될 때 실행되는 콜백
-                                // 변경된 이름을 저장하는 작업 가능
+// 이름이 변경될 때 실행되는 콜백
+// 변경된 이름을 저장하는 작업 가능
                                 affiliation = value;
                               },
                             ),
@@ -159,8 +160,8 @@ class JoinUpPage extends StatelessWidget {
                             child: TextField(
                               controller: positionController,
                               onChanged: (value) {
-                                // 이름이 변경될 때 실행되는 콜백
-                                // 변경된 이름을 저장하는 작업 가능
+// 이름이 변경될 때 실행되는 콜백
+// 변경된 이름을 저장하는 작업 가능
                                 position = value;
                               },
                             ),
@@ -184,8 +185,8 @@ class JoinUpPage extends StatelessWidget {
                             child: TextField(
                               controller: ageController,
                               onChanged: (value) {
-                                // 이름이 변경될 때 실행되는 콜백
-                                // 변경된 이름을 저장하는 작업 가능
+// 이름이 변경될 때 실행되는 콜백
+// 변경된 이름을 저장하는 작업 가능
                                 age = value;
                               },
                             ),
@@ -209,8 +210,8 @@ class JoinUpPage extends StatelessWidget {
                             child: TextField(
                               controller: genderController,
                               onChanged: (value) {
-                                // 이름이 변경될 때 실행되는 콜백
-                                // 변경된 이름을 저장하는 작업 가능
+// 이름이 변경될 때 실행되는 콜백
+// 변경된 이름을 저장하는 작업 가능
                                 gender = value;
                               },
                             ),
@@ -224,35 +225,36 @@ class JoinUpPage extends StatelessWidget {
                           height: 50, // 버튼 높이
                           child: ElevatedButton(
                             onPressed: () {
-                              // 회원가입 버튼 클릭 시 동작
+// 회원가입 버튼 클릭 시 동작
                               authService.signUp(
                                 email: emailController.text,
                                 password: passwordController.text,
                                 onSuccess: () {
-                                  //회원가입 성공
+//회원가입 성공
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text('회원가입 성공'),
                                     ),
                                   );
-                                  // print('회원가입 성공');
-                                  // 다음 페이지로 이동
+// print('회원가입 성공');
+// 다음 페이지로 이동
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          HomePage(), // NextPage는 다음 페이지의 이름입니다.
+                                      builder: (context) => LoginPage(
+                                        name: '',
+                                      ), // LoginPage 연결
                                     ),
                                   );
                                 },
                                 onError: (err) {
-                                  //에러발생
+//에러발생
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(err),
                                     ),
                                   );
-                                  // print('회원가입 실패 : $err');
+// print('회원가입 실패 : $err');
                                 },
                               );
                             },
