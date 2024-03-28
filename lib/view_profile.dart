@@ -90,7 +90,10 @@ class ViewProfile extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('프로필 수정'),
+              child: Text(
+                '프로필 수정',
+                style: TextStyle(color: Color(0xFF27F39D)),
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -103,7 +106,10 @@ class ViewProfile extends StatelessWidget {
                   (route) => false, // 모든 이전 라우트를 제거하기 위해 false를 반환합니다.
                 );
               },
-              child: Text('홈 페이지로 돌아가기'),
+              child: Text(
+                '홈 페이지로 돌아가기',
+                style: TextStyle(color: Color(0xFF27F39D)),
+              ),
             ),
           ],
         ),

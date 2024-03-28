@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncc_it/data_model.dart';
 import 'package:syncc_it/tab_bar_screen.dart';
 import 'package:syncc_it/tab_bar_screen1.dart';
@@ -7,7 +12,6 @@ import 'data_model.dart';
 import 'message_screen.dart';
 import 'package:syncc_it/view_profile.dart';
 import 'package:syncc_it/profile.dart'; // MyProfile 클래스의 경로에 맞게 수정해야 합니다.
-import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences 추가
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,14 +22,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late SharedPreferences _prefs; // _prefs 변수 선언
+  XFile? _profileImage;
 
   int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   void initState() {
@@ -35,6 +34,16 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadPrefs() async {
     _prefs = await SharedPreferences.getInstance(); // SharedPreferences 초기화
+    _loadProfileImage(); // 프로필 이미지 로드
+  }
+
+  Future<void> _loadProfileImage() async {
+    String? imagePath = _prefs.getString('profileImage');
+    if (imagePath != null) {
+      setState(() {
+        _profileImage = XFile(imagePath);
+      });
+    }
   }
 
   @override
@@ -68,7 +77,8 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => MyProfile(
-                      prefs: _prefs), // MyProfile 클래스의 인스턴스를 생성하여 이동합니다.
+                    prefs: _prefs,
+                  ), // MyProfile 클래스의 인스턴스를 생성하여 이동합니다.
                 ),
               );
             },
@@ -90,8 +100,12 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: CircleAvatar(
                           radius: 52,
-                          backgroundImage: NetworkImage(
-                              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D'),
+                          backgroundImage: _profileImage == null
+                              ? AssetImage(
+                                  'images/profile.png',
+                                ) as ImageProvider<Object>?
+                              : FileImage(File(_profileImage!.path))
+                                  as ImageProvider<Object>?,
                         ),
                       ),
                       Text(
@@ -215,15 +229,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             )
-
-            : _selectedIndex == 1
-            ? TabBarScreen()
-            : _selectedIndex == 2
-            ? ContactsScreen()
-            : _selectedIndex == 3
-            ? SendSMS()
-
-            : SizedBox(),
+          : _selectedIndex == 1
+              ? TabBarScreen()
+              : _selectedIndex == 2
+                  ? ContactsScreen()
+                  : _selectedIndex == 3
+                      ? SendSMS()
+                      : SizedBox(),
 
       // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
@@ -251,7 +263,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }
