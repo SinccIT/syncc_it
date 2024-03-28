@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncc_it/data_model.dart';
 import 'package:syncc_it/tab_bar_screen.dart';
+import 'package:syncc_it/tab_bar_screen1.dart';
+import 'data_model.dart';
+import 'message_screen.dart';
 import 'package:syncc_it/view_profile.dart';
 import 'package:syncc_it/profile.dart'; // MyProfile 클래스의 경로에 맞게 수정해야 합니다.
 import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences 추가
@@ -47,8 +50,12 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        leading: Icon(
-          Icons.menu,
+        leading: IconButton(
+          icon: Icon(Icons.add_home_outlined),
+          onPressed: () {
+            // 홈 화면으로 이동
+            Navigator.pushNamed(context, '/');
+          },
         ),
         actions: [
           IconButton(
@@ -208,13 +215,22 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             )
-          : _selectedIndex == 1
-              ? TabBarScreen()
-              : SizedBox(), // ContactsScreen 대신에 SizedBox 사용
+      
+            : _selectedIndex == 1
+            ? TabBarScreen()
+            : _selectedIndex == 2
+            ? ContactsScreen()
+            : _selectedIndex == 3
+            ? SendSMS()
+
+            : SizedBox(),
+
+      // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        selectedItemColor: Color(0xFF27F39D),
-        unselectedItemColor: Color(0xFFC8C8C8),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Color(0xFF313034),
+        selectedItemColor: Color(0xFF27F39D), // 선택된 항목의 색상
+        unselectedItemColor: Color(0xFFC8C8C8), // 선택되지 않은 항목의 색상
         showUnselectedLabels: true,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
