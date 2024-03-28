@@ -79,18 +79,27 @@ class ViewProfile extends StatelessWidget {
             SizedBox(height: 50),
             ElevatedButton(
               onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences
-                    .getInstance(); // SharedPreferences 인스턴스를 가져옵니다.
+                SharedPreferences prefs = await SharedPreferences.getInstance();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => MyProfile(
-                      prefs: prefs, // 가져온 SharedPreferences 인스턴스를 전달합니다.
+                      prefs: prefs,
                     ),
                   ),
                 );
               },
-              child: Text('프로필 수정'),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Color(0xFF27F39D)), // 버튼 배경색을 지정합니다.
+              ),
+              child: Text(
+                '프로필 수정',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF000000),
+                ),
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -98,12 +107,22 @@ class ViewProfile extends StatelessWidget {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HomePage(), // MyHomePage 위젯을 사용합니다.
+                    builder: (context) => HomePage(),
                   ),
-                  (route) => false, // 모든 이전 라우트를 제거하기 위해 false를 반환합니다.
+                  (route) => false,
                 );
               },
-              child: Text('홈 페이지로 돌아가기'),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+              ),
+              child: Text(
+                '홈 페이지로 돌아가기',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF000000),
+                ),
+              ),
             ),
           ],
         ),
