@@ -106,6 +106,7 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               icon: Icon(Icons.person),
+              tooltip: '프로필 보기', // 툴팁 추가
             ),
           ],
         ),
