@@ -70,8 +70,8 @@ class JoinUpPage extends StatelessWidget {
                         child: TextField(
                           controller: nameController,
                           onChanged: (value) {
-// 이름이 변경될 때 실행되는 콜백
-// 변경된 이름을 저장하는 작업 가능
+                            // 이름이 변경될 때 실행되는 콜백
+                            // 변경된 이름을 저장하는 작업 가능
                             name = value;
                           },
                         ),
@@ -99,25 +99,28 @@ class JoinUpPage extends StatelessWidget {
                           ]),
                       SizedBox(height: 10), // 각 입력 라인 사이의 간격 조절
                       Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '비밀번호',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '비밀번호',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            TextFieldContainer(
-                              controller:
-                                  passwordController, // 수정된 부분: controller 전달
-                              onChanged: (value) {
-                                // 입력값이 변경될 때 처리할 로직 추가
-                              },
-                              child: TextField(),
+                          ),
+                          TextFieldContainer(
+                            controller: passwordController,
+                            isPassword:
+                                true, // 비밀번호 필드에 대해 isPassword를 true로 설정
+                            child: TextField(
+                              controller: passwordController,
+                              onChanged: (value) {},
+                              obscureText: true, // 비밀번호 마스킹 처리
                             ),
-                          ]),
+                          ),
+                        ],
+                      ),
                       SizedBox(height: 10), // 각 입력 라인 사이의 간격 조절
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,6 +246,7 @@ class JoinUpPage extends StatelessWidget {
                                     MaterialPageRoute(
                                       builder: (context) => LoginPage(
                                         name: '',
+                                        isPassword: true,
                                       ), // LoginPage 연결
                                     ),
                                   );
@@ -298,13 +302,18 @@ class JoinUpPage extends StatelessWidget {
 class TextFieldContainer extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String>? onChanged;
+  final bool isPassword;
+  final TextField child;
 
-  const TextFieldContainer(
-      {Key? key,
-      this.onChanged,
-      required this.controller,
-      required TextField child})
-      : super(key: key);
+  const TextFieldContainer({
+    Key? key,
+    this.onChanged,
+    required this.controller,
+    this.isPassword = false,
+    required this.child,
+  }) : super(key: key);
+
+  TextEditingController get passwordController => controller;
 
   @override
   Widget build(BuildContext context) {
@@ -325,6 +334,7 @@ class TextFieldContainer extends StatelessWidget {
         ),
         style: TextStyle(color: Colors.white), // 입력 필드의 글자색을 하얀색으로 설정
         cursorColor: Colors.white, // 입력 커서의 색상을 하얀색으로 설정
+        obscureText: isPassword, // 비밀번호 입력시 마스킹 처리
       ),
     );
   }
