@@ -278,7 +278,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
         actions: [
           TextButton(
             onPressed: _saveContact,
-            child: Text('Save'),
+            child: Text(
+              '저장',
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
           ),
         ],
       ),
@@ -373,6 +378,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       _addGroup(_selectedContacts);
                                       Navigator.of(context).pop();
                                     },
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Color(0xFF27F39D)),
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.black),
+                                    ),
                                     child: Text('확인'),
                                   ),
                                 ),
@@ -384,6 +397,15 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     },
                   );
                 },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.black),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                    Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
+                  ),
+                ),
                 child: Text('멤버 추가'),
               ),
               SizedBox(height: 12.0),
@@ -446,6 +468,11 @@ class GroupDetailScreen extends StatelessWidget {
                   ),
                 );
               },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+              ),
               child: Text('수정'),
             ),
           ),
@@ -550,6 +577,20 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
   late TextEditingController _descriptionController;
   late TextEditingController _tagsController;
   late List<String> _selectedMembers;
+  late SharedPreferences prefs; // SharedPreferences 필드 추가
+  List<String> _groupItems = [];
+  List<String> _groupItemDescriptions = [];
+  List<String> _groupItemTags = [];
+  List<List<String>> _selectedContacts = [];
+  List<String> contacts = [
+    '김성종',
+    '박채연',
+    '유윤경',
+    '이한조',
+    '백승용',
+    '송가람',
+    '이재형'
+  ]; // 예시 연락처 목록
 
   @override
   void initState() {
@@ -559,6 +600,91 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
         TextEditingController(text: widget.groupDescription);
     _tagsController = TextEditingController(text: widget.groupTags);
     _selectedMembers = List.from(widget.selectedMembers);
+    _initSharedPreferences(); // SharedPreferences 초기화 메서드 호출
+  }
+
+// SharedPreferences 초기화 메서드 정의
+  Future<void> _initSharedPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  void _saveChanges() async {
+    String newName = _nameController.text;
+    String newDescription = _descriptionController.text;
+    String newTags = _tagsController.text;
+    List<String> newMembers = List.from(_selectedMembers);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> groupItems = prefs.getStringList('groupItems') ?? [];
+    List<String> groupItemDescriptions =
+        prefs.getStringList('groupItemDescriptions') ?? [];
+    List<String> groupItemTags = prefs.getStringList('groupItemTags') ?? [];
+    List<String> selectedContacts =
+        prefs.getStringList('selectedContacts') ?? [];
+
+    // 수정할 그룹의 인덱스를 찾습니다.
+    int index = groupItems.indexOf(widget.groupName);
+
+    // 그룹 정보를 업데이트합니다.
+    if (index != -1) {
+      groupItems[index] = newName;
+      groupItemDescriptions[index] = newDescription;
+      groupItemTags[index] = newTags;
+      if (selectedContacts.length > index) {
+        selectedContacts[index] = newMembers.join(',');
+      }
+    }
+
+    // SharedPreferences에 수정된 정보를 저장합니다.
+    await prefs.setStringList('groupItems', groupItems);
+    await prefs.setStringList('groupItemDescriptions', groupItemDescriptions);
+    await prefs.setStringList('groupItemTags', groupItemTags);
+    await prefs.setStringList('selectedContacts', selectedContacts);
+
+    // 수정된 정보를 이전 페이지로 전달하여 목록 화면을 업데이트합니다.
+    Navigator.pop(context, {
+      'name': newName,
+      'description': newDescription,
+      'tags': newTags,
+      'members': newMembers
+    });
+
+    // 목록 화면을 업데이트합니다.
+    _updateList({
+      'name': newName,
+      'description': newDescription,
+      'tags': newTags,
+      'members': newMembers
+    });
+  }
+
+  void _updateList(Map<String, dynamic> updatedInfo) {
+    setState(() {
+      // 수정된 정보에서 필요한 값을 추출합니다.
+      String newName = updatedInfo['name'];
+      String newDescription = updatedInfo['description'];
+      String newTags = updatedInfo['tags'];
+      List<String> newMembers = List<String>.from(updatedInfo['members']);
+
+      // 업데이트된 정보로 해당하는 그룹 아이템을 찾아서 업데이트합니다.
+      int index = _groupItems.indexOf(widget.groupName);
+      if (index != -1) {
+        _groupItems[index] = newName;
+        _groupItemDescriptions[index] = newDescription;
+        _groupItemTags[index] = newTags;
+        // 선택된 멤버가 그룹 아이템에 포함되어 있는지 확인한 후 업데이트합니다.
+        if (_selectedContacts.length > index) {
+          _selectedContacts[index] = List.from(newMembers);
+        }
+      }
+    });
+  }
+
+  void _addMembers(String name, String description, String tags,
+      List<String> selectedContacts) {
+    setState(() {
+      _selectedMembers.addAll(selectedContacts);
+    });
   }
 
   @override
@@ -622,21 +748,75 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
               SizedBox(height: 12.0),
               ElevatedButton(
                 onPressed: () async {
-                  // 멤버 추가 화면으로 이동하여 선택된 멤버 업데이트
-                  List<String>? newMembers = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddContactScreen(
-                        onAdd: _addGroup1,
-                      ),
-                    ),
+                  // Open a modal bottom sheet to select members
+                  List<String>? selectedContacts = await showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: contacts.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final contact = contacts[index];
+                                    return CheckboxListTile(
+                                      title: Text(contact),
+                                      value: _selectedMembers.contains(contact),
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          if (value!) {
+                                            _selectedMembers.add(contact);
+                                          } else {
+                                            _selectedMembers.remove(contact);
+                                          }
+                                        });
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: 12.0),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context, _selectedMembers);
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Color(0xFF27F39D)),
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.black),
+                                  minimumSize: MaterialStateProperty.all<Size>(
+                                      Size(double.infinity, 60)),
+                                ),
+                                child: Text('확인'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   );
-                  if (newMembers != null) {
+                  if (selectedContacts != null) {
                     setState(() {
-                      _selectedMembers = newMembers;
+                      _selectedMembers = List.from(
+                          selectedContacts); // Update selected members
                     });
                   }
                 },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.black),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                      Size(double.infinity, 40)),
+                ),
                 child: Text('멤버 추가'),
               ),
               SizedBox(height: 12.0),
@@ -645,6 +825,15 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   // 수정된 정보 저장
                   _saveChanges();
                 },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.black),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                    Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
+                  ),
+                ),
                 child: Text('저장'),
               ),
             ],
@@ -652,24 +841,6 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
         ),
       ),
     );
-  }
-
-  void _saveChanges() {
-    String newName = _nameController.text;
-    String newDescription = _descriptionController.text;
-    String newTags = _tagsController.text;
-    List<String> newMembers = List.from(_selectedMembers);
-
-    // 수정된 정보 저장
-    // 예: 데이터베이스 업데이트 또는 SharedPreferences 업데이트
-
-    // 수정이 완료되면 이전 페이지로 이동
-    Navigator.pop(context, {
-      'name': newName,
-      'description': newDescription,
-      'tags': newTags,
-      'members': newMembers
-    });
   }
 
   // 선택된 멤버 추가 함수 정의

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syncc_it/auth_service.dart';
 
+import 'auth_service.dart';
 import 'home_page.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -82,7 +82,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             '연락처 목록',
             style: TextStyle(
               fontSize: 20,
-              color: Color(0xFF000000),
+              color: Color(0xFF27F39D),
             ),
           ),
         ),
@@ -178,12 +178,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             ),
           );
         },
-        backgroundColor: Color(0xFF27F39D),
-        shape: CircleBorder(),
-        child: Icon(
-          Icons.add,
-          color: Color(0xFF000000),
-        ),
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -247,7 +242,7 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
                         padding: EdgeInsets.all(20), // 테두리와 아이콘 사이의 간격을 설정합니다.
                         decoration: BoxDecoration(
                           shape: BoxShape.circle, // 동그라미 모양의 테두리를 만듭니다.
-                          color: Colors.grey, // 원의 색상을 설정합니다.
+                          color: Color(0xFFC8C8C8), // 원의 색상을 설정합니다.
                         ),
                         child: Icon(
                           Icons.person, // 아이콘을 선택합니다.
@@ -279,6 +274,15 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
                         widget.onAdd(name, description, tags);
                         Navigator.pop(context);
                       },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.black),
+                        minimumSize: MaterialStateProperty.all<Size>(
+                          Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
+                        ),
+                      ),
                       child: Text('저장'),
                     ),
                   ],
@@ -331,13 +335,14 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
             children: [
               Center(
                 child: CircleAvatar(
+                  backgroundColor: Color(0xFFC8C8C8),
                   radius: 100,
                   // backgroundImage: NetworkImage(
                   //   'https://via.placeholder.com/150', // 대체 이미지 URL
                   // ),
                   child: Icon(
                     Icons.person, // 아이콘을 선택합니다.
-                    size: 100, // 아이콘의 크기를 조정합니다.
+                    size: 150, // 아이콘의 크기를 조정합니다.
                     color: Colors.white, // 아이콘의 색상을 설정합니다.
                   ),
                 ),
@@ -391,6 +396,15 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                     ),
                   );
                 },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.black),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                    Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
+                  ),
+                ),
                 child: Text('수정'),
               ),
             ],
@@ -443,41 +457,46 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthService>(
-      builder: (context, authService, child) {
-        return Scaffold(
-        appBar: AppBar(
-          title: Text('연락처 수정'),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('연락처 수정'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+              ),
+              onChanged: widget.onNameChanged, // 이름이 변경될 때 콜백 함수 호출
+            ),
+            SizedBox(height: 12.0),
+            TextField(
+              controller: _phoneNumberController,
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+              ),
+              onChanged: widget.onPhoneNumberChanged, // 전화번호가 변경될 때 콜백 함수 호출
+            ),
+            SizedBox(height: 12.0), // 버튼 위에 간격 추가
+            ElevatedButton(
+              onPressed: (_saveChanges),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                minimumSize: MaterialStateProperty.all<Size>(
+                  Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
                 ),
-                onChanged: widget.onNameChanged, // 이름이 변경될 때 콜백 함수 호출
               ),
-              SizedBox(height: 12.0),
-              TextField(
-                controller: _phoneNumberController,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                ),
-                onChanged: widget.onPhoneNumberChanged, // 전화번호가 변경될 때 콜백 함수 호출
-              ),
-              SizedBox(height: 12.0), // 버튼 위에 간격 추가
-              ElevatedButton(
-                onPressed: (_saveChanges),
-                child: Text('저장'),
-              ),
-            ],
-          ),
+              child: Text('저장'),
+            ),
+          ],
         ),
-      );},
+      ),
     );
   }
 
@@ -510,13 +529,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
       _nameController.clear();
       _phoneNumberController.clear();
     }
-
     final AuthService authService = context.read<AuthService>();
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HomePage(authService: authService,),
+        builder: (context) => HomePage(
+          authService: authService,
+        ),
       ),
     );
   }
