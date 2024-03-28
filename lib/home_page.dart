@@ -215,13 +215,15 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             )
-          : _selectedIndex == 1
-              ? TabBarScreen()
-              : _selectedIndex == 2
-                  ? ContactsScreen()
-                  : _selectedIndex == 3
-                      ? SendSMS()
-                      : SizedBox(),
+
+            : _selectedIndex == 1
+            ? TabBarScreen()
+            : _selectedIndex == 2
+            ? ContactsScreen()
+            : _selectedIndex == 3
+            ? SendSMS()
+
+            : SizedBox(),
 
       // bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(

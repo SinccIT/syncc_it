@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'group_item.dart';
-
 class TabBarScreen extends StatefulWidget {
   @override
   _TabBarScreenState createState() => _TabBarScreenState();
@@ -39,7 +37,7 @@ class _TabBarScreenState extends State<TabBarScreen> {
       _groupItems.add(item);
       _groupItemDescriptions.add(description);
       _groupItemTags.add(tags);
-      _selectedContacts.addAll(selectedMembers); // 선택된 멤버 목록을 추가합니다.
+      _selectedContacts = List.from(selectedMembers); // 선택된 멤버 목록을 복사합니다.
     });
     await prefs.setStringList('groupItems', _groupItems);
     await prefs.setStringList('groupItemDescriptions', _groupItemDescriptions);
@@ -48,12 +46,30 @@ class _TabBarScreenState extends State<TabBarScreen> {
         _selectedContacts); // 탭마다 별도의 저장 키 사용
   }
 
-  void _removeItem(int index) async {
+  void _removeItem(String tabIdentifier) async {
     setState(() {
-      _groupItems.removeAt(index);
-      _groupItemDescriptions.removeAt(index);
-      _groupItemTags.removeAt(index);
+      int index = _groupItems.indexOf(tabIdentifier); // 그룹 아이템의 인덱스 가져오기
+      if (index != -1) {
+        // 그룹 아이템 삭제
+        _groupItems.removeAt(index);
+        _groupItemDescriptions.removeAt(index);
+        _groupItemTags.removeAt(index);
+
+        // 선택된 멤버 목록의 키 수정
+        for (int i = index; i < _groupItems.length; i++) {
+          String key = 'selectedContacts_$i';
+          String nextKey = 'selectedContacts_${i + 1}';
+          List<String>? selectedContacts = prefs.getStringList(nextKey);
+          if (selectedContacts != null) {
+            // 다음 탭의 선택된 멤버 목록을 현재 탭으로 이동
+            _selectedContacts = selectedContacts;
+            prefs.setStringList(key, _selectedContacts);
+            prefs.remove(nextKey);
+          }
+        }
+      }
     });
+
     await prefs.setStringList('groupItems', _groupItems);
     await prefs.setStringList('groupItemDescriptions', _groupItemDescriptions);
     await prefs.setStringList('groupItemTags', _groupItemTags);
@@ -66,69 +82,101 @@ class _TabBarScreenState extends State<TabBarScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('그룹 목록'),
+        automaticallyImplyLeading: false, // 뒤로가기 버튼 비활성화
+        title: Padding(
+          padding:
+              const EdgeInsets.only(left: 16.0), // 그룹 목록을 왼쪽 끝으로 위치시키기 위한 패딩 추가
+          child: Text(
+            '그룹 목록',
+            style: TextStyle(
+              fontSize: 20,
+              color: Color(0xFF27F39D),
+            ),
+          ),
+        ),
       ),
       body: ListView.builder(
         itemCount: _groupItems.length,
         itemBuilder: (context, index) {
-          return Card(
-            elevation: 3,
-            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: ListTile(
-              leading: Icon(Icons.work),
-              title: Text(
-                _groupItems[index],
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(_groupItemDescriptions[index]),
-              onTap: () {
-                // 그룹 상세조회 페이지로 이동
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GroupDetailScreen(
-                      groupName: _groupItems[index],
-                      groupDescription: _groupItemDescriptions[index],
-                      groupTags: _groupItemTags[index],
-                      selectedMembers:
-                          prefs.getStringList('selectedContacts_$index') ??
-                              [], // 해당 탭에 대한 선택된 멤버 불러오기
-                    ),
+          return ListTile(
+            tileColor: Colors.white, // ListTile의 배경색 설정
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10), // 타일의 테두리 모양 설정
+            ),
+            leading: Container(
+              width: 48, // CircleAvatar의 지름과 동일한 너비
+              height: 48, // CircleAvatar의 지름과 동일한 높이
+              child: CircleAvatar(
+                backgroundColor: Color(0xFFEEEEEE),
+                child: Text(
+                  _groupItems[index][0],
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
                   ),
+                ),
+              ),
+            ),
+            title: Text(
+              _groupItems[index],
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              _groupItemDescriptions[index],
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFFC8C8C8),
+              ),
+            ),
+            onTap: () {
+              // 그룹 상세조회 페이지로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GroupDetailScreen(
+                    groupName: _groupItems[index],
+                    groupDescription: _groupItemDescriptions[index],
+                    groupTags: _groupItemTags[index],
+                    selectedMembers:
+                        prefs.getStringList('selectedContacts_$index') ?? [],
+                  ),
+                ),
+              );
+            },
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                // 삭제 다이얼로그 표시
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("삭제"),
+                      content: Text("이 그룹을 삭제하시겠습니까?"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("취소"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              String tabIdentifier =
+                                  _groupItems[index]; // 삭제할 탭의 고유 식별자를 가져옵니다.
+                              _removeItem(
+                                  tabIdentifier); // 고유 식별자와 인덱스를 전달하여 삭제합니다.
+                            });
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("삭제"),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  // 삭제 다이얼로그 표시
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text("삭제"),
-                        content: Text("이 그룹을 삭제하시겠습니까?"),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("취소"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _removeItem(index); // 항목 삭제
-                              });
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("삭제"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
             ),
           );
         },
@@ -206,6 +254,13 @@ class _AddContactScreenState extends State<AddContactScreen> {
     Navigator.pop(context);
   }
 
+  // Group 추가 함수 정의
+  void _addGroup(List<String> selectedContacts) {
+    setState(() {
+      _selectedContacts = selectedContacts;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,72 +311,73 @@ class _AddContactScreenState extends State<AddContactScreen> {
               SizedBox(height: 12.0),
               ElevatedButton(
                 onPressed: () async {
-                  // Fetch contacts
+                  // 연락처 가져오기
                   List<String> contacts = await _fetchContacts();
-                  // Open dialog to select contacts
-                  showDialog(
+                  showModalBottomSheet(
                     context: context,
                     builder: (context) {
                       return StatefulBuilder(
                         builder: (context, setState) {
-                          return AlertDialog(
-                            title: Text("멤버 추가"),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: contacts.map((contact) {
-                                  bool isSelected =
-                                      _selectedContacts.contains(contact);
-                                  return CheckboxListTile(
-                                    title: Text(contact),
-                                    value: isSelected,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        if (newValue!) {
-                                          _selectedContacts.add(
-                                              contact); // Add contact when checked
-                                        } else {
-                                          _selectedContacts.remove(
-                                              contact); // Remove contact when unchecked
-                                        }
-                                      });
+                          return Container(
+                            height: MediaQuery.of(context).size.height * 0.8,
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    '멤버 추가',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                    itemCount: contacts.length,
+                                    itemBuilder: (context, index) {
+                                      String contact = contacts[index];
+                                      return ListTile(
+                                        title: Text(contact),
+                                        trailing:
+                                            _selectedContacts.contains(contact)
+                                                ? Icon(Icons.check_circle)
+                                                : Icon(Icons.circle_outlined),
+                                        onTap: () {
+                                          setState(() {
+                                            if (_selectedContacts
+                                                .contains(contact)) {
+                                              _selectedContacts.remove(contact);
+                                            } else {
+                                              _selectedContacts.add(contact);
+                                            }
+                                          });
+                                        },
+                                      );
                                     },
-                                  );
-                                }).toList(),
-                              ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      _addGroup(_selectedContacts);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('확인'),
+                                  ),
+                                ),
+                              ],
                             ),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text("취소"),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  // Close dialog and pass selected contacts
-                                  Navigator.of(context).pop(_selectedContacts);
-                                },
-                                child: Text("확인"),
-                              ),
-                            ],
                           );
                         },
                       );
                     },
-                  ).then((selectedContacts) {
-                    // Update selected contacts on dialog close
-                    if (selectedContacts != null) {
-                      setState(() {
-                        _selectedContacts = List.from(selectedContacts);
-                      });
-                    }
-                  });
+                  );
                 },
                 child: Text('멤버 추가'),
               ),
               SizedBox(height: 12.0),
-              // Display selected contacts
               Wrap(
                 children: _selectedContacts.map((contact) {
                   return Padding(
@@ -364,6 +420,27 @@ class GroupDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('그룹 정보'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditGroupScreen(
+                      groupName: groupName,
+                      groupDescription: groupDescription,
+                      groupTags: groupTags,
+                      selectedMembers: selectedMembers,
+                    ),
+                  ),
+                );
+              },
+              child: Text('수정'),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 64.0, horizontal: 32.0),
@@ -439,5 +516,158 @@ class GroupDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class EditGroupScreen extends StatefulWidget {
+  final String groupName;
+  final String groupDescription;
+  final String groupTags;
+  final List<String> selectedMembers;
+
+  const EditGroupScreen({
+    required this.groupName,
+    required this.groupDescription,
+    required this.groupTags,
+    required this.selectedMembers,
+  });
+
+  @override
+  _EditGroupScreenState createState() => _EditGroupScreenState();
+}
+
+class _EditGroupScreenState extends State<EditGroupScreen> {
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _tagsController;
+  late List<String> _selectedMembers;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.groupName);
+    _descriptionController =
+        TextEditingController(text: widget.groupDescription);
+    _tagsController = TextEditingController(text: widget.groupTags);
+    _selectedMembers = List.from(widget.selectedMembers);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('그룹 수정'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64.0, horizontal: 32.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: CircleAvatar(
+                  radius: 100,
+                  backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D',
+                  ),
+                ),
+              ),
+              SizedBox(height: 64.0),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Group Name',
+                ),
+              ),
+              SizedBox(height: 12.0),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  labelText: 'Group Description',
+                ),
+              ),
+              SizedBox(height: 12.0),
+              TextField(
+                controller: _tagsController,
+                decoration: InputDecoration(
+                  labelText: 'Tags',
+                ),
+              ),
+              SizedBox(height: 12.0),
+              // 선택된 멤버 표시
+              Wrap(
+                children: _selectedMembers.map((member) {
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Chip(
+                      label: Text(member),
+                      onDeleted: () {
+                        setState(() {
+                          _selectedMembers.remove(member);
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 12.0),
+              ElevatedButton(
+                onPressed: () async {
+                  // 멤버 추가 화면으로 이동하여 선택된 멤버 업데이트
+                  List<String>? newMembers = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddContactScreen(
+                        onAdd: _addGroup1,
+                      ),
+                    ),
+                  );
+                  if (newMembers != null) {
+                    setState(() {
+                      _selectedMembers = newMembers;
+                    });
+                  }
+                },
+                child: Text('멤버 추가'),
+              ),
+              SizedBox(height: 12.0),
+              ElevatedButton(
+                onPressed: () {
+                  // 수정된 정보 저장
+                  _saveChanges();
+                },
+                child: Text('저장'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _saveChanges() {
+    String newName = _nameController.text;
+    String newDescription = _descriptionController.text;
+    String newTags = _tagsController.text;
+    List<String> newMembers = List.from(_selectedMembers);
+
+    // 수정된 정보 저장
+    // 예: 데이터베이스 업데이트 또는 SharedPreferences 업데이트
+
+    // 수정이 완료되면 이전 페이지로 이동
+    Navigator.pop(context, {
+      'name': newName,
+      'description': newDescription,
+      'tags': newTags,
+      'members': newMembers
+    });
+  }
+
+  // 선택된 멤버 추가 함수 정의
+  void _addGroup1(String name, String description, String tags,
+      List<String> selectedContacts) {
+    setState(() {
+      _selectedMembers = List.from(selectedContacts);
+    });
   }
 }
