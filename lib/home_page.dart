@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:syncc_it/auth_service.dart';
 import 'package:syncc_it/data_model.dart';
@@ -20,6 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late SharedPreferences _prefs; // _prefs 변수 선언
+  XFile? _profileImage;
 
   @override
   void initState() {
@@ -29,7 +33,17 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadPrefs() async {
     _prefs = await SharedPreferences.getInstance(); // SharedPreferences 초기화
+    _loadProfileImage();
     setState(() {});
+  }
+
+  Future<void> _loadProfileImage() async {
+    String? imagePath = _prefs.getString('profileImage');
+    if(imagePath != null) {
+      setState(() {
+        _profileImage = XFile(imagePath);
+      });
+    }
   }
 
   int _selectedIndex = 0;
@@ -37,6 +51,12 @@ class _HomePageState extends State<HomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  void _updateProfileImage(XFile imageFile) {
+    setState(() {
+      _profileImage = imageFile;
     });
   }
 
@@ -103,9 +123,11 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: CircleAvatar(
                           radius: 52,
-                          backgroundImage: NetworkImage(
-                              '$user?.photoURL'
-                          ),
+                          backgroundImage: _profileImage == null
+                            ? AssetImage('images/profile.png',
+                          ) as ImageProvider<Object>?
+                          : FileImage(File(_profileImage!.path))
+                            as ImageProvider<Object>?,
                         ),
                       ),
                       Text(
