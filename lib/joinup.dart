@@ -99,16 +99,16 @@ class JoinUpPage extends StatelessWidget {
                           ]),
                       SizedBox(height: 10), // 각 입력 라인 사이의 간격 조절
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '비밀번호',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '비밀번호',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
                           TextFieldContainer(
                             controller: passwordController,
                             isPassword:

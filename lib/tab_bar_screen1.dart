@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncc_it/auth_service.dart';
 
 import 'home_page.dart';
 
@@ -80,7 +82,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             '연락처 목록',
             style: TextStyle(
               fontSize: 20,
-              color: Color(0xFF27F39D),
+              color: Color(0xFF000000),
             ),
           ),
         ),
@@ -176,7 +178,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
             ),
           );
         },
-        child: Icon(Icons.add),
+        backgroundColor: Color(0xFF27F39D),
+        shape: CircleBorder(),
+        child: Icon(
+          Icons.add,
+          color: Color(0xFF000000),
+        ),
       ),
     );
   }
@@ -436,38 +443,41 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('연락처 수정'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-              ),
-              onChanged: widget.onNameChanged, // 이름이 변경될 때 콜백 함수 호출
-            ),
-            SizedBox(height: 12.0),
-            TextField(
-              controller: _phoneNumberController,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-              ),
-              onChanged: widget.onPhoneNumberChanged, // 전화번호가 변경될 때 콜백 함수 호출
-            ),
-            SizedBox(height: 12.0), // 버튼 위에 간격 추가
-            ElevatedButton(
-              onPressed: (_saveChanges),
-              child: Text('저장'),
-            ),
-          ],
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        return Scaffold(
+        appBar: AppBar(
+          title: Text('연락처 수정'),
         ),
-      ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                ),
+                onChanged: widget.onNameChanged, // 이름이 변경될 때 콜백 함수 호출
+              ),
+              SizedBox(height: 12.0),
+              TextField(
+                controller: _phoneNumberController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                ),
+                onChanged: widget.onPhoneNumberChanged, // 전화번호가 변경될 때 콜백 함수 호출
+              ),
+              SizedBox(height: 12.0), // 버튼 위에 간격 추가
+              ElevatedButton(
+                onPressed: (_saveChanges),
+                child: Text('저장'),
+              ),
+            ],
+          ),
+        ),
+      );},
     );
   }
 
@@ -500,10 +510,13 @@ class _EditContactScreenState extends State<EditContactScreen> {
       _nameController.clear();
       _phoneNumberController.clear();
     }
+
+    final AuthService authService = context.read<AuthService>();
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HomePage(),
+        builder: (context) => HomePage(authService: authService,),
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data_model.dart';
+
 class TabBarScreen extends StatefulWidget {
   @override
   _TabBarScreenState createState() => _TabBarScreenState();
@@ -77,6 +79,8 @@ class _TabBarScreenState extends State<TabBarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final data = DataProvider.of(context);
+
     if (!_initialized) {
       return Center(child: CircularProgressIndicator());
     }
@@ -90,7 +94,7 @@ class _TabBarScreenState extends State<TabBarScreen> {
             '그룹 목록',
             style: TextStyle(
               fontSize: 20,
-              color: Color(0xFF27F39D),
+              color: Color(0xFF000000),
             ),
           ),
         ),
@@ -190,7 +194,12 @@ class _TabBarScreenState extends State<TabBarScreen> {
             ),
           );
         },
-        child: Icon(Icons.add),
+        backgroundColor: Color(0xFF27F39D),
+        shape: CircleBorder(),
+        child: Icon(
+          Icons.add,
+          color: Color(0xFF000000),
+        ),
       ),
     );
   }
