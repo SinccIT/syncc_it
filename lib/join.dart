@@ -54,6 +54,7 @@ class JoinPage extends StatelessWidget {
                         MaterialPageRoute(
                             builder: (context) => LoginPage(
                                   name: '',
+                                  isPassword: true,
                                 )), // LoginPage로 이동
                       );
                     },
