@@ -120,13 +120,33 @@ class _MyProfileState extends State<MyProfile> {
             SizedBox(height: 50),
             ElevatedButton(
               onPressed: _saveAndNavigateToViewProfile,
-              child: Text('저장'),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+              ),
+              child: Text(
+                '저장',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF000000),
+                ),
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _navigateToViewProfile,
-              child: Text('프로필 보기'),
-            )
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+              ),
+              child: Text(
+                '프로필 보기',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF000000),
+                ),
+              ),
+            ),
           ],
         ),
       ),
