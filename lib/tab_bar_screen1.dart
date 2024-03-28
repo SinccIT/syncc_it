@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'home_page.dart';
+
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({
     Key? key,
@@ -500,10 +502,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ContactsScreen(
-          updatedContactName: newName,
-          updatedContactPhoneNumber: newPhoneNumber,
-        ),
+        builder: (context) => HomePage(),
       ),
     );
   }
