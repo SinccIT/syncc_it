@@ -240,7 +240,7 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
                         padding: EdgeInsets.all(20), // 테두리와 아이콘 사이의 간격을 설정합니다.
                         decoration: BoxDecoration(
                           shape: BoxShape.circle, // 동그라미 모양의 테두리를 만듭니다.
-                          color: Colors.grey, // 원의 색상을 설정합니다.
+                          color: Color(0xFFC8C8C8), // 원의 색상을 설정합니다.
                         ),
                         child: Icon(
                           Icons.person, // 아이콘을 선택합니다.
@@ -272,6 +272,15 @@ class _AddContactScreenState1 extends State<AddContactScreen1> {
                         widget.onAdd(name, description, tags);
                         Navigator.pop(context);
                       },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.black),
+                        minimumSize: MaterialStateProperty.all<Size>(
+                          Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
+                        ),
+                      ),
                       child: Text('저장'),
                     ),
                   ],
@@ -324,13 +333,14 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
             children: [
               Center(
                 child: CircleAvatar(
+                  backgroundColor: Color(0xFFC8C8C8),
                   radius: 100,
                   // backgroundImage: NetworkImage(
                   //   'https://via.placeholder.com/150', // 대체 이미지 URL
                   // ),
                   child: Icon(
                     Icons.person, // 아이콘을 선택합니다.
-                    size: 100, // 아이콘의 크기를 조정합니다.
+                    size: 150, // 아이콘의 크기를 조정합니다.
                     color: Colors.white, // 아이콘의 색상을 설정합니다.
                   ),
                 ),
@@ -384,6 +394,15 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                     ),
                   );
                 },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.black),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                    Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
+                  ),
+                ),
                 child: Text('수정'),
               ),
             ],
@@ -463,6 +482,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
             SizedBox(height: 12.0), // 버튼 위에 간격 추가
             ElevatedButton(
               onPressed: (_saveChanges),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                minimumSize: MaterialStateProperty.all<Size>(
+                  Size(double.infinity, 40), // 버튼을 가로로 길게 만듭니다.
+                ),
+              ),
               child: Text('저장'),
             ),
           ],
