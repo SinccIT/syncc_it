@@ -215,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             )
-      
+
             : _selectedIndex == 1
             ? TabBarScreen()
             : _selectedIndex == 2
