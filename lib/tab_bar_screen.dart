@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'auth_service.dart';
 import 'data_model.dart';
+import 'home_page.dart';
 
 class TabBarScreen extends StatefulWidget {
   @override
@@ -656,6 +659,17 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
       'tags': newTags,
       'members': newMembers
     });
+
+    final AuthService authService = context.read<AuthService>();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomePage(
+          authService: authService,
+        ),
+      ),
+    );
   }
 
   void _updateList(Map<String, dynamic> updatedInfo) {

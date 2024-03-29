@@ -82,7 +82,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             '연락처 목록',
             style: TextStyle(
               fontSize: 20,
-              color: Color(0xFF27F39D),
+              color: Color(0xFF000000),
             ),
           ),
         ),
@@ -178,7 +178,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
             ),
           );
         },
-        child: Icon(Icons.add),
+        backgroundColor: Color(0xFF27F39D),
+        shape: CircleBorder(),
+        child: Icon(
+          Icons.add,
+          color: Color(0xFF000000),
+        ),
       ),
     );
   }
