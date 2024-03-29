@@ -25,6 +25,7 @@ class SendSMS extends StatefulWidget {
 class _SendSMSState extends State<SendSMS> {
   List<String> recipients = [];
   int totalRecipientsCount = 0;
+  List<String> selectedRecipients = [];
 
   String message = "";
   String selectedTime = "즉시"; // 전송시간 default값
@@ -52,7 +53,6 @@ class _SendSMSState extends State<SendSMS> {
   // 수신인 추가 버튼 클릭 시 호출되는 함수
   void addRecipients(BuildContext context) async {
     final dataModel = Provider.of<DataModel>(context, listen: false);
-    List<String> selectedRecipients = [];
 
     await showModalBottomSheet(
       context: context,
@@ -201,7 +201,6 @@ class _SendSMSState extends State<SendSMS> {
                         _addGroup(recipients);
 
                         // 선택된 항목이 추가된 후에 selectedRecipients 비움
-                        selectedRecipients.clear();
 
                         // 변경된 상태를 반영하기 위해 setState 호출
 
