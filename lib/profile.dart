@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncc_it/auth_service.dart';
 import 'dart:io';
 import 'package:syncc_it/view_profile.dart';
 
@@ -59,97 +62,114 @@ class _MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        child: ListView(
-          children: <Widget>[
-            imageProfile(context),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                _editName();
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _nameController.text,
+    return Consumer<AuthService>(
+      builder: (context, authService,child) {
+        User? user = authService.currentUser();
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Profile'),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: ListView(
+              children: <Widget>[
+                imageProfile(context),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    _editName();
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _nameController.text,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      Icon(Icons.edit, size: 20),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    _editIntro();
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _introController.text,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      Icon(Icons.edit, size: 20),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 50),
+                Text(
+                  'Email',
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        user?.email ?? '',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ]
+                ),
+                SizedBox(height: 32),
+                nameTextFieldWithIcon(
+                    'Phone Number', _phoneNumberController, Icons.edit),
+                SizedBox(height: 32),
+                buildContactTimeDropdown(),
+                SizedBox(height: 50),
+                ElevatedButton(
+                  onPressed: _saveAndNavigateToViewProfile,
+                  style: ButtonStyle(
+                    backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                  ),
+                  child: Text(
+                    '저장',
                     style: TextStyle(
-                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: Color(0xFF000000),
                     ),
                   ),
-                  SizedBox(width: 5),
-                  Icon(Icons.edit, size: 20),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                _editIntro();
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _introController.text,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _navigateToViewProfile,
+                  style: ButtonStyle(
+                    backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
+                  ),
+                  child: Text(
+                    '프로필 보기',
                     style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF000000),
                     ),
                   ),
-                  SizedBox(width: 5),
-                  Icon(Icons.edit, size: 20),
-                ],
-              ),
-            ),
-            SizedBox(height: 50),
-            nameTextFieldWithIcon('ID', _idController, Icons.edit),
-            SizedBox(height: 20),
-            nameTextFieldWithIcon('E-MAIL', _emailController, Icons.edit),
-            SizedBox(height: 20),
-            nameTextFieldWithIcon(
-                'Phone Number', _phoneNumberController, Icons.edit),
-            SizedBox(height: 50),
-            buildContactTimeDropdown(),
-            SizedBox(height: 50),
-            ElevatedButton(
-              onPressed: _saveAndNavigateToViewProfile,
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
-              ),
-              child: Text(
-                '저장',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF000000),
                 ),
-              ),
+              ],
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _navigateToViewProfile,
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Color(0xFF27F39D)),
-              ),
-              child: Text(
-                '프로필 보기',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF000000),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
